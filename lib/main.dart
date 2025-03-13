@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:iftar/signup.dart';
+
+import 'bottomnavbar.dart';
+import 'listresto.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AuthScreen(),
+      home: MainScreen(),
     );
   }
 }
 
+class MainScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IftarScreen(),
+      bottomNavigationBar: CustomNavBarWidget(role: "patient"), // Pass role dynamically
+    );
+  }
+}

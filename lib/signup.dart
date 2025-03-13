@@ -30,22 +30,20 @@ class _AuthScreenState extends State<AuthScreen> {
                   Image.asset("assets/star.png", height: 150),
                 ],
               ),
-              Expanded(child: Container()), // Push the form to the bottom
             ],
           ),
 
-          // Animated Container positioned at the bottom
-          AnimatedAlign(
+          // Animated Positioned Container
+          AnimatedPositioned(
             duration: Duration(milliseconds: 500),
             curve: Curves.easeInOut,
-            alignment: isLogin ? Alignment.bottomCenter : Alignment.center,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.75, // Login small, Signup full height
             child: AnimatedContainer(
               duration: Duration(milliseconds: 500),
               curve: Curves.easeInOut,
-              width: MediaQuery.of(context).size.width,
-              constraints: BoxConstraints(
-                minHeight: isLogin ? 250 : 450, // Small for login, larger for signup
-              ),
               decoration: BoxDecoration(
                 color: color.bgColor,
                 borderRadius: BorderRadius.only(
@@ -79,6 +77,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   // Text Fields
                   Column(
                     children: [
+                      if (!isLogin) CustomTextField(Icons.person, "Full Name.."), // Full Name field
+                      if (!isLogin) CustomTextField(Icons.phone, "Phone Number.."), // Phone Number field
                       CustomTextField(Icons.email, "Email address.."),
                       CustomTextField(Icons.lock, "Password..", isPassword: true),
                       if (!isLogin) CustomTextField(Icons.lock, "Verify password..", isPassword: true),
