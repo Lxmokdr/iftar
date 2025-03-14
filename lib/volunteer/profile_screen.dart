@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iftar/classes/colors.dart';
+import 'package:iftar/common/signup.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -64,7 +65,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _showSettingsBottomSheet(context);
             }),
             _buildNotificationOption(),
-            _buildProfileOption(Icons.logout, 'Log Out', () {}),
+            _buildProfileOption(Icons.logout, 'Log Out', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AuthScreen()),
+              );
+            }),
           ],
         ),
       ),

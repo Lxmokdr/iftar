@@ -11,7 +11,6 @@ import '../resto/needs.dart';
 import '../resto/post_screen_mat3am.dart';
 import '../volunteer/profile_screen.dart';
 
-
 class CustomNavBarWidget extends StatefulWidget {
   final String role;
 
@@ -35,32 +34,61 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
     if (widget.role == "volunteer") {
       return [IftarScreen(), ShowScreen(), ProfileScreen()];
     } else {
-      return [NeedsScreen(), PostScreen(), IftarDashboard()];
+      return [NeedsScreen(), IftarDashboard(), PostScreen(), ProfileScreen()];
     }
   }
 
   /// 📌 Defines navbar items with custom colors
   List<PersistentBottomNavBarItem> _navBarItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.home, color: Colors.white),
-        title: "Home",
-        activeColorPrimary: color.bgColor,
-        inactiveColorPrimary: Colors.white,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.inbox, color: Colors.white),
-        title: "Inbox",
-        activeColorPrimary: color.bgColor,
-        inactiveColorPrimary: Colors.white,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.person, color: Colors.white),
-        title: "Profile",
-        activeColorPrimary: color.bgColor,
-        inactiveColorPrimary: Colors.white,
-      ),
-    ];
+    if (widget.role == "volunteer") {
+      return [
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.home, color: Colors.white),
+          title: "Home",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.inbox, color: Colors.white),
+          title: "Inbox",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.person, color: Colors.white),
+          title: "Profile",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+      ];
+    } else {
+      return [
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.home, color: Colors.white),
+          title: "Home",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.dashboard, color: Colors.white),
+          title: "Dashboard",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.inbox, color: Colors.white),
+          title: "Inbox",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+        PersistentBottomNavBarItem(
+          icon: Icon(Icons.person, color: Colors.white),
+          title: "Profile",
+          activeColorPrimary: color.bgColor,
+          inactiveColorPrimary: Colors.white,
+        ),
+      ];
+    }
   }
 
   @override

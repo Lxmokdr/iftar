@@ -24,7 +24,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: NeedsScreen(),
-      bottomNavigationBar: CustomNavBarWidget(role: "restaurant"), // Pass role dynamically
+      bottomNavigationBar: CustomNavBarWidget(role: "volunteer"), // Pass role dynamically
     );
   }
 }

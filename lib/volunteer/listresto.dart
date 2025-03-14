@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../common/bottomnavbar.dart';
 import '../classes/colors.dart';
 import 'help.dart';
 
@@ -10,8 +8,6 @@ class IftarScreen extends StatefulWidget {
 }
 
 class _IftarScreenState extends State<IftarScreen> {
-  int _selectedIndex = 0; // Track selected navbar item
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,12 +17,15 @@ class _IftarScreenState extends State<IftarScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 15,),
+            SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Iftar',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color.darkcolor),),
+                Text(
+                  'Iftar',
+                  style: TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold, color: color.darkcolor),
+                ),
                 IconButton(
                   icon: Icon(Icons.language, color: color.darkcolor),
                   onPressed: () {},
@@ -37,7 +36,7 @@ class _IftarScreenState extends State<IftarScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'full name',
+                  'Full Name',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
                 ),
                 SizedBox(height: 4),
@@ -86,7 +85,14 @@ class _IftarScreenState extends State<IftarScreen> {
   }
 }
 
-class RestaurantCard extends StatelessWidget {
+class RestaurantCard extends StatefulWidget {
+  @override
+  State<RestaurantCard> createState() => _RestaurantCardState();
+}
+
+class _RestaurantCardState extends State<RestaurantCard> {
+  double progressLevel = 0.6; // Example level, can be changed dynamically
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -120,21 +126,73 @@ class RestaurantCard extends StatelessWidget {
                 ],
               ),
             ),
-            Column(
+            Stack(
+              alignment: Alignment.center,
               children: [
-                Icon(Icons.location_pin, color: color.darkcolor, size: 35,),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: color.darkcolor),
-                  onPressed: () {},
-                  child: Text('Book Iftar', style: TextStyle(color: Colors.white)),
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    value: progressLevel, // This controls the level
+                    strokeWidth: 5,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan), // Change color as needed
+                  ),
                 ),
-
+                Text(
+                  '${(progressLevel * 100).toInt()}%', // Show percentage inside
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
+            SizedBox(
+              width: 10,
+            ),
+            Column(
+              children: [
+                Icon(Icons.location_pin, color: color.darkcolor, size: 35),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: color.darkcolor),
+                  onPressed: () {
+                    _showBookingConfirmation(context);
+                  },
+                  child: Text('Book Iftar', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
+
           ],
         ),
       ),
+    );
+  }
+
+  void _showBookingConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Booking"),
+          content: Text("Are you sure you want to book this Iftar?"),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(backgroundColor: color.darkcolor),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Yes", style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(backgroundColor: color.darkcolor),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

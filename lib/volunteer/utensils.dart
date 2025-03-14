@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iftar/volunteer/utesilist.dart';
-
 import '../classes/colors.dart';
 import 'help.dart';
 
@@ -10,11 +9,21 @@ class UtensilLoanScreen extends StatefulWidget {
 }
 
 class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
-  TextEditingController utensilController = TextEditingController();
+  String? selectedUtensil;
   TextEditingController quantityController = TextEditingController();
   TextEditingController loanTermController = TextEditingController();
   TextEditingController transportationController = TextEditingController();
   TextEditingController arrivalTimeController = TextEditingController();
+
+  final List<String> utensils = [
+    "Plates",
+    "Cups",
+    "Spoons",
+    "Forks",
+    "Knives",
+    "Pots",
+    "Serving Trays",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -52,29 +61,62 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
           ),
           SizedBox(height: 16),
 
-          /// 🔹 INPUT FIELDS
-          _buildInputField("Utensil name..", utensilController),
+          /// 🔹 UTENSIL DROPDOWN FIELD
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: DropdownButtonFormField<String>(
+              value: selectedUtensil,
+              hint: Text("Select Utensil"),
+              items: utensils.map((String utensil) {
+                return DropdownMenuItem<String>(
+                  value: utensil,
+                  child: Text(utensil),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedUtensil = value;
+                });
+              },
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: color.bgColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+
+          /// 🔹 OTHER INPUT FIELDS
           _buildInputField("Quantity..", quantityController),
           _buildInputField("Loan Term..", loanTermController),
           _buildInputField("Need Transportation? Y/N", transportationController),
           _buildInputField("Arrival time..", arrivalTimeController),
 
+          SizedBox(height: 20,),
           /// 🔹 ACTION BUTTONS
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildActionButton("Done", () {print("Done");
-              Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
+              _buildActionButton("Done", () {
+                print("Done");
+                Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
               }),
               SizedBox(width: 16),
               _buildActionButton("See List", () {
                 print("See List");
-                Navigator.push(context, MaterialPageRoute(builder: (_) => Utensilist()));
-
+                Navigator.push(context, MaterialPageRoute(builder: (_) => Utensilist(utensils: [
+                  {"name": "Assiette", "needed": 20, "available": 15},
+                  {"name": "Fourchette", "needed": 20, "available": 10},
+                  {"name": "Marmite", "needed": 2, "available": 1},
+                  {"name": "Bol", "needed": 10, "available": 5},
+                  {"name": "Cuillère", "needed": 5, "available": 2},
+                ]), ));
               }),
             ],
           ),
-
         ],
       ),
     );
