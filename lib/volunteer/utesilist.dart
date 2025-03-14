@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:iftar/classes/colors.dart';
 import 'package:iftar/volunteer/utensils.dart';
 
+import 'help.dart';
+
 class Utensilist extends StatefulWidget {
   final List<Map<String, dynamic>> utensils;
   Utensilist({required this.utensils});
@@ -116,9 +118,20 @@ class _UtensilistState extends State<Utensilist> {
 
 
           /// 🔹 HELP BUTTON
-          _buildActionButton("Help", () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => UtensilLoanScreen()));
-          }),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildActionButton("Done", () {
+                print("Done");
+                Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
+              }),
+              SizedBox(width: 16),
+              _buildActionButton("See List", () {
+                print("See List");
+                Navigator.push(context, MaterialPageRoute(builder: (_) => UtensilLoanScreen()));
+              }),
+            ],
+          ),
           SizedBox(height: 20),
         ],
       ),
