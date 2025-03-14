@@ -6,7 +6,8 @@ import 'package:iftar/volunteer/listresto.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../classes/colors.dart';
-import '../resto/dashboard.dart';
+import '../main.dart';
+import '../resto/list_of_helpers.dart';
 import '../resto/needs.dart';
 import '../resto/post_screen_mat3am.dart';
 import '../volunteer/profile_screen.dart';
@@ -34,7 +35,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
     if (widget.role == "volunteer") {
       return [IftarScreen(), ShowScreen(), ProfileScreen()];
     } else {
-      return [NeedsScreen(), IftarDashboard(), PostScreen(), ProfileScreen()];
+      return [NeedsScreen(), DASH(), PostScreen(), ProfileScreen()];
     }
   }
 

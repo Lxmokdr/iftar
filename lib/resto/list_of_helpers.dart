@@ -1,195 +1,272 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fl_chart/fl_chart.dart';
+
+import '../classes/colors.dart';
+
+class DASH extends StatefulWidget {
+  @override
+  _DASHState createState() => _DASHState();
+}
+
+class _DASHState extends State<DASH> {
+  int _selectedIndex = 0;
+  final List<Widget> _screens = [
+    IftarDashboard(),
+    HelpersTableScreen(),
+    ClientsTableScreen(),
+  ];
+
+  void _navigate(bool isNext) {
+    setState(() {
+      if (isNext) {
+        _selectedIndex = (_selectedIndex + 1) % _screens.length;
+      } else {
+        _selectedIndex = (_selectedIndex - 1 + _screens.length) % _screens.length;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          _screens[_selectedIndex],
+          Positioned(
+            left: 10,
+            top: MediaQuery.of(context).size.height / 2 - 20,
+            child: IconButton(
+              icon: Icon(Icons.arrow_back_ios, size: 30),
+              onPressed: () => _navigate(false),
+            ),
+          ),
+          Positioned(
+            right: 10,
+            top: MediaQuery.of(context).size.height / 2 - 20,
+            child: IconButton(
+              icon: Icon(Icons.arrow_forward_ios, size: 30),
+              onPressed: () => _navigate(true),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class IftarDashboard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top App Bar Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Iftar",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: color.darkcolor,
+                    ),
+                  ),
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundImage: AssetImage('assets/img_1.png'), // Change to your image asset
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10),
+
+              // Comparison to last day
+              Text(
+                "COMPARISON TO LAST DAY",
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              Row(
+                children: [
+                  Text(
+                    "\$9 905,00",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    "\$440 ↑",
+                    style: TextStyle(fontSize: 20, color: Colors.pink, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10),
+
+              // Bar Chart
+              Container(
+                height: 150,
+                child: BarChart(
+                  BarChartData(
+                    borderData: FlBorderData(show: false),
+                    gridData: FlGridData(show: false),
+                    titlesData: FlTitlesData(show: false),
+                    barGroups: [
+                      BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 10, color: Colors.green)]),
+                      BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 6, color: Colors.red)]),
+                      BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 9, color: Colors.purple)]),
+                      BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 7, color: Colors.yellow)]),
+                      BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 8, color: Colors.blue)]),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              // Unaccomplished deliveries & Unsatisfied Needs
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "Unaccomplished deliveries: 2",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    Text(
+                      "Unsatisfied needs: 3",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              // Stats Grid (Cards made bigger)
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1, // **Increased for bigger cards**
+                  children: [
+                    _buildStatCard("TOTAL COMPLETED TRANSPORTATIONS", "4", Colors.pink),
+                    _buildStatCard("TOTAL VOLUNTEERS", "20", Colors.orange),
+                    _buildStatCard("TOTAL CLIENTS", "50", Colors.green),
+                    _buildStatCard("TOTAL FOOD RECEIVED", "50 MEALS", Colors.purple),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  // Function to build a stat card (Made padding bigger)
+  Widget _buildStatCard(String title, String value, Color color) {
+    return Container(
+      padding: EdgeInsets.all(20), // **Increased padding for better spacing**
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8), // **Increased spacing**
+          Text(
+            value,
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class HelpersTableScreen extends StatelessWidget {
-  final List<String> columns = ["name", "Organizer", "Food", "Tools"];
-
+  final List<String> columns = ["Name", "Phone", "Help Type", "Status"];
   final List<Map<String, String>> data = [
-    {
-      "name": "issam menas with a long text",
-      "Organizer": "Yes",
-      "Food": "bourak with extra info",
-      "Tools": "Table",
-    },
-    {
-      "name": "issam menas",
-      "Organizer": "No",
-      "Food": "/",
-      "Tools": "Marmit",
-    },
-    {
-      "name": "issam menas",
-      "Organizer": "Yes",
-      "Food": "bourak",
-      "Tools": "Table",
-    },
-    {
-      "name": "issam menas",
-      "Organizer": "Yes",
-      "Food": "bourak",
-      "Tools": "Table",
-    },
+    {"Name": "Issam Menas", "Phone": "123456", "Help Type": "Food", "Status": "Available"},
+    {"Name": "John Doe", "Phone": "789012", "Help Type": "Transport", "Status": "Busy"},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Screen background white
-
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color.fromARGB(255, 203, 140, 52),
+      appBar: AppBar(title: Text("Helpers")),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal, // Allows horizontal scrolling
+          child: DataTable(
+            columns: columns.map((col) => DataColumn(label: Text(col))).toList(),
+            rows: data.map((row) {
+              return DataRow(cells: [
+                DataCell(Text(row["Name"]!)),
+                DataCell(Text(row["Phone"]!)),
+                DataCell(DropdownButton<String>(
+                  value: row["Help Type"],
+                  items: ["Food", "Transport", "Tools"].map((String item) {
+                    return DropdownMenuItem(value: item, child: Text(item));
+                  }).toList(),
+                  onChanged: (value) {},
+                )),
+                DataCell(DropdownButton<String>(
+                  value: row["Status"],
+                  items: ["Available", "Busy"].map((String item) {
+                    return DropdownMenuItem(value: item, child: Text(item));
+                  }).toList(),
+                  onChanged: (value) {},
+                )),
+              ]);
+            }).toList(),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          "Statistics of Today",
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/pfp.jpg'),
-            ),
-          ),
-        ],
-      ),
-
-      bottomNavigationBar: Container(
-        margin: EdgeInsets.only(left: 16, right: 16, bottom: 30),
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 203, 140, 52),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
-            elevation: 0,
-            items: [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-              BottomNavigationBarItem(icon: Icon(Icons.message), label: 'INBOX'),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PROFILE'),
-            ],
-          ),
-        ),
-      ),
-
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Subtitle
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text(
-              "List of helpers",
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ),
-
-          // Scrollable Table
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Container(
-                  margin: const EdgeInsets.all(16.0), // Margin around the table
-                  child: Table(
-                    columnWidths: {
-                      for (int i = 0; i < columns.length; i++)
-                        i: IntrinsicColumnWidth(),
-                    },
-                    border: TableBorder.all(color: Colors.grey),
-                    children: [
-                      // Header Row (dynamic)
-                      TableRow(
-                        children: columns.map((col) => _buildHeaderCell(col)).toList(),
-                      ),
-
-                      // Data Rows (dynamic)
-                      ...data.map((row) {
-                        return TableRow(
-                          children: columns.map((col) => _buildCell(row[col] ?? "")).toList(),
-                        );
-                      }).toList(),
-
-                      // Totals Row
-                      TableRow(
-                        children: columns.asMap().entries.map((entry) {
-                          if (entry.key == 0) {
-                            return _buildCell("Total", isHeader: true);
-                          } else {
-                            return _buildCell("30", isHeader: true);
-                          }
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderCell(String text) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.grey[400],
-      ),
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        softWrap: false,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: const Color.fromARGB(255, 203, 140, 52),
         ),
       ),
     );
   }
+}
 
-  Widget _buildCell(String text, {bool isHeader = false}) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: isHeader ? Colors.grey[400] : Colors.grey[200],
-      ),
-      child: Text(
-        text.isNotEmpty ? text : '--',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        softWrap: false,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          color: isHeader
-              ? const Color.fromARGB(255, 203, 140, 52)
-              : Colors.black,
+
+class ClientsTableScreen extends StatelessWidget {
+  final List<String> columns = ["Name", "Phone"];
+  final List<Map<String, String>> clients = [
+    {"Name": "Alice Johnson", "Phone": "111222"},
+    {"Name": "Bob Smith", "Phone": "333444"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Clients")),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: DataTable(
+          columns: columns.map((col) => DataColumn(label: Text(col))).toList(),
+          rows: clients.map((row) {
+            return DataRow(cells: [
+              DataCell(Text(row["Name"]!)),
+              DataCell(Text(row["Phone"]!)),
+            ]);
+          }).toList(),
         ),
       ),
     );
