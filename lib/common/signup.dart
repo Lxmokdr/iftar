@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'colors.dart';
+import '../classes/colors.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -8,7 +7,8 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool isLogin = false; // Toggle state
+  bool isLogin = false; // Toggle between Login & Signup
+  bool isVolunteer = true; // Toggle between Volunteer & Restaurant
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
             bottom: 0,
             left: 0,
             right: 0,
-            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.75, // Login small, Signup full height
+            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.75,
             child: AnimatedContainer(
               duration: Duration(milliseconds: 500),
               curve: Curves.easeInOut,
@@ -59,16 +59,48 @@ class _AuthScreenState extends State<AuthScreen> {
                     isLogin ? 'Login' : 'Signup',
                     style: TextStyle(color: color.darkcolor, fontSize: 32),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
+
+                  // Signup Type Toggle (Only for Signup)
+                  if (!isLogin)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ChoiceChip(
+                          label: Text("Volunteer"),
+                          selected: isVolunteer,
+                          selectedColor: color.darkcolor,
+                          backgroundColor: color.lightbg,
+                          onSelected: (selected) {
+                            setState(() {
+                              isVolunteer = true;
+                            });
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        ChoiceChip(
+                          label: Text("Restaurant"),
+                          selected: !isVolunteer,
+                          selectedColor: color.darkcolor,
+                          backgroundColor: color.lightbg,
+                          onSelected: (selected) {
+                            setState(() {
+                              isVolunteer = false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  SizedBox(height: 10),
 
                   // Social Login (Only for Signup)
                   if (!isLogin)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SocialButton("assets/google.png", 30),
+                        SocialButton("assets/google.png", 20),
                         SizedBox(width: 20),
-                        SocialButton("assets/facebook.png", 50),
+                        SocialButton("assets/facebook.png", 40),
                       ],
                     ),
 
@@ -77,8 +109,12 @@ class _AuthScreenState extends State<AuthScreen> {
                   // Text Fields
                   Column(
                     children: [
-                      if (!isLogin) CustomTextField(Icons.person, "Full Name.."), // Full Name field
-                      if (!isLogin) CustomTextField(Icons.phone, "Phone Number.."), // Phone Number field
+                      if (!isLogin)
+                        CustomTextField(
+                          Icons.business,
+                          isVolunteer ? "Full Name.." : "Restaurant Name..",
+                        ),
+                      if (!isLogin) CustomTextField(Icons.phone, "Phone Number.."),
                       CustomTextField(Icons.email, "Email address.."),
                       CustomTextField(Icons.lock, "Password..", isPassword: true),
                       if (!isLogin) CustomTextField(Icons.lock, "Verify password..", isPassword: true),
@@ -100,7 +136,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     onPressed: () {
                       setState(() {
-                        isLogin = !isLogin; // Toggle state on click
+                        isLogin = !isLogin;
                       });
                     },
                     child: Text(
@@ -117,7 +153,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            isLogin = !isLogin; // Toggle Login/Signup
+                            isLogin = !isLogin;
                           });
                         },
                         child: Text(
@@ -146,7 +182,7 @@ class SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      radius: 25,
+      radius: 15,
       backgroundColor: Colors.white,
       child: Image.asset(imagePath, height: height),
     );

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:iftar/payerment.dart';
-import 'package:iftar/transportation.dart';
-import 'colors.dart';
+import 'package:iftar/volunteer/organazing.dart';
+import 'package:iftar/volunteer/payerment.dart';
+import 'package:iftar/volunteer/transportation.dart';
+import 'package:iftar/volunteer/utensils.dart';
+import '../classes/colors.dart';
 import 'foodpage.dart'; // Ensure you have a colors.dart file for custom colors
 
 class IftarHelpScreen extends StatelessWidget {
@@ -102,11 +104,11 @@ class IftarHelpScreen extends StatelessWidget {
                         }),
                         _helpButton('Utensils', () {
                           print('Utensils help requested!');
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => Foodpage()));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => UtensilLoanScreen()));
                         }),
                         _helpButton('Organizing', () {
                           print('Organizing help requested!');
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => Organization()));
                         }),
                       ],
                     ),
@@ -127,7 +129,7 @@ class IftarHelpScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 5),
       child: Container(
         decoration: BoxDecoration(
-          color: color.lightbg,
+          color: color.bgColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: ListTile(

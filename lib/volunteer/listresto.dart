@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'bottomnavbar.dart';
-import 'colors.dart';
+import '../common/bottomnavbar.dart';
+import '../classes/colors.dart';
 import 'help.dart';
 
 class IftarScreen extends StatefulWidget {

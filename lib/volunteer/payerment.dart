@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../classes/colors.dart';
+import 'help.dart';
+
 class PaymentScreen extends StatefulWidget {
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -16,7 +19,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFFD2A679),
+        backgroundColor: color.bgColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -28,7 +31,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           /// 🔹 IMAGE HEADER
           Container(
             decoration: BoxDecoration(
-              color: Color(0xFFD2A679),
+              color: color.bgColor,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
@@ -88,7 +91,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       margin: EdgeInsets.only(bottom: 10),
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Color(0xFFF3E2C7),
+                        color: color.bgColor,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected ? Border.all(color: Colors.black, width: 2) : null,
                       ),
@@ -108,7 +111,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               child: Container(
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFFEDEDED),
+                  color: color.bgColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -136,9 +139,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: ElevatedButton(
-              onPressed: selectedMethod != null ? () => print("Paid via $selectedMethod") : null,
+              onPressed: selectedMethod != null ? () =>
+              {print("Paid via $selectedMethod"),
+              Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()))
+
+            }
+                  : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFD2A679),
+                backgroundColor: color.darkcolor,
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),

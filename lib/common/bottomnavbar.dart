@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:iftar/profile.dart';
-import 'package:iftar/signup.dart';
+import 'package:iftar/volunteer/show_post.dart';
+import 'package:iftar/common/signup.dart';
+import 'package:iftar/volunteer/listresto.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-import 'colors.dart';
-import 'listresto.dart';
+import '../classes/colors.dart';
+import '../resto/dashboard.dart';
+import '../resto/needs.dart';
+import '../resto/post_screen_mat3am.dart';
+import '../volunteer/profile_screen.dart';
+
 
 class CustomNavBarWidget extends StatefulWidget {
   final String role;
@@ -26,7 +32,11 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
 
   /// 📌 Defines screens based on role
   List<Widget> _buildScreens() {
-    return [IftarScreen(), AuthScreen(), profile()];
+    if (widget.role == "volunteer") {
+      return [IftarScreen(), ShowScreen(), ProfileScreen()];
+    } else {
+      return [NeedsScreen(), PostScreen(), IftarDashboard()];
+    }
   }
 
   /// 📌 Defines navbar items with custom colors
@@ -35,23 +45,20 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
       PersistentBottomNavBarItem(
         icon: Icon(Icons.home, color: Colors.white),
         title: "Home",
-        activeColorPrimary: color.darkcolor,
+        activeColorPrimary: color.bgColor,
         inactiveColorPrimary: Colors.white,
-        inactiveColorSecondary: Colors.white,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.inbox, color: Colors.white),
         title: "Inbox",
-        activeColorPrimary: color.darkcolor,
+        activeColorPrimary: color.bgColor,
         inactiveColorPrimary: Colors.white,
-        inactiveColorSecondary: Colors.white,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.person, color: Colors.white),
         title: "Profile",
-        activeColorPrimary: color.darkcolor,
+        activeColorPrimary: color.bgColor,
         inactiveColorPrimary: Colors.white,
-        inactiveColorSecondary: Colors.white,
       ),
     ];
   }
