@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iftar/volunteer/transportation.dart';
 import '../classes/colors.dart';
 import 'help.dart';
 
@@ -78,6 +79,21 @@ class _IftarScreenState extends State<IftarScreen> {
                 },
               ),
             ),
+            SizedBox(height: 16),
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: color.goldGradient, // Apply your custom gradient
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.directions_car, color: Colors.white, size: 30),
+                  onPressed: () {
+                    showTransportSelectionPopup(context);
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -100,6 +116,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
       child: Padding(
         padding: EdgeInsets.all(12),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -113,18 +130,34 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   Text('Ain Taya', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   Text('15 min', style: TextStyle(color: Colors.grey)),
                   SizedBox(height: 6),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: color.darkcolor),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => IftarHelpScreen()),
-                      );
-                    },
-                    child: Text('Help', style: TextStyle(color: Colors.white)),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: color.goldGradient,
+                      borderRadius: BorderRadius.circular(50), // Matches button shape
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => IftarHelpScreen()),
+                        );
+                      },
+                      child: Text('Help', style: TextStyle(color: Colors.white)),
+                    ),
                   ),
                 ],
               ),
+            ),
+            Icon(Icons.location_pin, color: color.darkcolor, size: 45),
+            SizedBox(
+              width: 30,
             ),
             Stack(
               alignment: Alignment.center,
@@ -145,23 +178,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 ),
               ],
             ),
-            SizedBox(
-              width: 10,
-            ),
-            Column(
-              children: [
-                Icon(Icons.location_pin, color: color.darkcolor, size: 35),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: color.darkcolor),
-                  onPressed: () {
-                    _showBookingConfirmation(context);
-                  },
-                  child: Text('Book Iftar', style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-
           ],
         ),
       ),

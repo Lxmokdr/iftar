@@ -125,11 +125,7 @@ class _UtensilistState extends State<Utensilist> {
                 print("Done");
                 Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
               }),
-              SizedBox(width: 16),
-              _buildActionButton("See List", () {
-                print("See List");
-                Navigator.push(context, MaterialPageRoute(builder: (_) => UtensilLoanScreen()));
-              }),
+
             ],
           ),
           SizedBox(height: 20),
@@ -140,14 +136,25 @@ class _UtensilistState extends State<Utensilist> {
 
   /// 🔹 FUNCTION TO BUILD ACTION BUTTON
   Widget _buildActionButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color.darkcolor,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: color.goldGradient,
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(text, style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent, // Transparent for gradient
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
+
 }

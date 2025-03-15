@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iftar/volunteer/utesilist.dart';
 import '../classes/colors.dart';
+import '../common/button.dart';
 import 'help.dart';
 
 class UtensilLoanScreen extends StatefulWidget {
@@ -11,8 +12,6 @@ class UtensilLoanScreen extends StatefulWidget {
 class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
   String? selectedUtensil;
   TextEditingController quantityController = TextEditingController();
-  TextEditingController loanTermController = TextEditingController();
-  TextEditingController transportationController = TextEditingController();
   TextEditingController arrivalTimeController = TextEditingController();
 
   final List<String> utensils = [
@@ -28,129 +27,158 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: color.bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
+      body: Stack(
+        alignment: Alignment.topCenter,
         children: [
-          /// 🔹 IMAGE HEADER
+          /// 🔹 Full Gradient Background
           Container(
             decoration: BoxDecoration(
-              color: color.bgColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            padding: EdgeInsets.all(16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                'assets/img.png', // Replace with your actual image
-                width: double.infinity,
-                height: 150,
-                fit: BoxFit.cover,
-              ),
+              gradient: color.goldGradient,
             ),
           ),
-          SizedBox(height: 16),
 
-          /// 🔹 UTENSIL DROPDOWN FIELD
+          /// 🔹 Top Title
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: DropdownButtonFormField<String>(
-              value: selectedUtensil,
-              hint: Text("Select Utensil"),
-              items: utensils.map((String utensil) {
-                return DropdownMenuItem<String>(
-                  value: utensil,
-                  child: Text(utensil),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedUtensil = value;
-                });
-              },
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: color.bgColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+            padding: EdgeInsets.only(top: 75),
+            child: Column(
+              children: [
+                Text(
+                  "WHAT DO U WANNA HELP",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "WITH?",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+
+          /// 🔹 Main Content
+          Column(
+            children: [
+              SizedBox(height: 200),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 50),
+
+                      /// 🔹 UTENSIL DROPDOWN FIELD
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: DropdownButtonFormField<String>(
+                          value: selectedUtensil,
+                          hint: Text("Select Utensil"),
+                          items: utensils.map((String utensil) {
+                            return DropdownMenuItem<String>(
+                              value: utensil,
+                              child: Text(utensil),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedUtensil = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// 🔹 OTHER INPUT FIELDS
+                      buildInputField("Quantity..", quantityController),
+                      buildInputField("Arrival time..", arrivalTimeController),
+
+                      SizedBox(height: 20),
+
+                      /// 🔹 ACTION BUTTONS
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          buildActionButton("Done", () {
+                            print("Done");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => IftarHelpScreen()),
+                            );
+                          }),
+                          SizedBox(width: 16),
+                          buildActionButton("See List", () {
+                            print("See List");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => Utensilist(
+                                  utensils: [
+                                    {"name": "Assiette", "needed": 20, "available": 20},
+                                    {"name": "Fourchette", "needed": 20, "available": 10},
+                                    {"name": "Marmite", "needed": 2, "available": 1},
+                                    {"name": "Bol", "needed": 10, "available": 5},
+                                    {"name": "Cuillère", "needed": 5, "available": 2},
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+
+                      Spacer(),
+
+                      /// 🔹 FOOTER TEXT
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text('If you need transportation call the center'),
+                          Text('0557334515'),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
 
-          /// 🔹 OTHER INPUT FIELDS
-          _buildInputField("Quantity..", quantityController),
-          _buildInputField("Loan Term..", loanTermController),
-          _buildInputField("Need Transportation? Y/N", transportationController),
-          _buildInputField("Arrival time..", arrivalTimeController),
-
-          SizedBox(height: 20,),
-          /// 🔹 ACTION BUTTONS
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          /// 🔹 PROFILE IMAGE
+          Column(
             children: [
-              _buildActionButton("Done", () {
-                print("Done");
-                Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
-              }),
-              SizedBox(width: 16),
-              _buildActionButton("See List", () {
-                print("See List");
-                Navigator.push(context, MaterialPageRoute(builder: (_) => Utensilist(utensils: [
-                  {"name": "Assiette", "needed": 20, "available": 15},
-                  {"name": "Fourchette", "needed": 20, "available": 10},
-                  {"name": "Marmite", "needed": 2, "available": 1},
-                  {"name": "Bol", "needed": 10, "available": 5},
-                  {"name": "Cuillère", "needed": 5, "available": 2},
-                ]), ));
-              }),
+              SizedBox(height: 150),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/img.png'),
+              ),
             ],
           ),
         ],
       ),
-    );
-  }
-
-  /// 🔹 FUNCTION TO BUILD INPUT FIELD
-  Widget _buildInputField(String hint, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: hint,
-          filled: true,
-          fillColor: Color(0xFFF3E2C7),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 🔹 FUNCTION TO BUILD ACTION BUTTON
-  Widget _buildActionButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color.darkcolor,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      child: Text(text, style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
     );
   }
 }

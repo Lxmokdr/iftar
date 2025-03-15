@@ -7,6 +7,8 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../classes/colors.dart';
 import '../main.dart';
+import '../resto/dashboard.dart';
+import '../resto/dashboardnav.dart';
 import '../resto/list_of_helpers.dart';
 import '../resto/needs.dart';
 import '../resto/post_screen_mat3am.dart';
@@ -35,7 +37,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
     if (widget.role == "volunteer") {
       return [IftarScreen(), ShowScreen(), ProfileScreen()];
     } else {
-      return [NeedsScreen(), DASH(), PostScreen(), ProfileScreen()];
+      return [NeedsScreen(), dashboardNAv(), PostScreen(), ProfileScreen()];
     }
   }
 
@@ -44,49 +46,49 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
     if (widget.role == "volunteer") {
       return [
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.home, color: color.darkcolor),
           title: "Home",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.inbox, color: Colors.white),
+          icon: Icon(Icons.inbox, color: color.darkcolor),
           title: "Inbox",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.person, color: Colors.white),
+          icon: Icon(Icons.person, color: color.darkcolor),
           title: "Profile",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
       ];
     } else {
       return [
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.home, color: color.darkcolor),
           title: "Home",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.dashboard, color: Colors.white),
+          icon: Icon(Icons.dashboard, color: color.darkcolor),
           title: "Dashboard",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.inbox, color: Colors.white),
+          icon: Icon(Icons.inbox, color: color.darkcolor),
           title: "Inbox",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.person, color: Colors.white),
+          icon: Icon(Icons.person, color: color.darkcolor),
           title: "Profile",
           activeColorPrimary: color.bgColor,
-          inactiveColorPrimary: Colors.white,
+          inactiveColorPrimary: color.darkcolor,
         ),
       ];
     }
@@ -95,14 +97,12 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20), // Space at bottom
+      padding: const EdgeInsets.only(bottom: 0), // Space at bottom
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30), // Rounded edges
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9, // Slightly wider navbar
           decoration: BoxDecoration(
-            color: color.darkcolor, // Custom background color
-            borderRadius: BorderRadius.circular(30),
+            color: Colors.white
           ),
           child: PersistentTabView(
             context,
@@ -110,7 +110,11 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
             screens: _buildScreens(),
             items: _navBarItems(),
             confineToSafeArea: true,
-            backgroundColor: color.darkcolor, // Custom background color
+            backgroundColor: Colors.transparent, // Transparent so the gradient shows
+            decoration: NavBarDecoration(
+              borderRadius: BorderRadius.circular(50), // Match container radius
+              colorBehindNavBar: Colors.transparent,
+            ),
             navBarStyle: NavBarStyle.style3, // Custom navbar style
           ),
         ),

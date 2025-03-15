@@ -3,7 +3,6 @@ import 'package:iftar/volunteer/organazing.dart';
 import 'package:iftar/volunteer/payerment.dart';
 import 'package:iftar/volunteer/transportation.dart';
 import 'package:iftar/volunteer/utensils.dart';
-import 'package:iftar/volunteer/utesilist.dart';
 import '../classes/colors.dart';
 import 'foodpage.dart';
 
@@ -13,165 +12,238 @@ class IftarHelpScreen extends StatefulWidget {
 }
 
 class _IftarHelpScreenState extends State<IftarHelpScreen> {
-  // Track completion status of each category
-  Map<String, bool> helpStatus = {
-    'Food': false,
-    'Money': false,
-    'Transportation': true,
-    'Utensils': false,
-    'Organizing': false,
-  };
 
-  void markHelped(String category) {
-    setState(() {
-      helpStatus[category] = true;
-    });
+  bool isOrganizingConfirmed = false;
+
+
+  void toggleOrganizing() {
+    if (!isOrganizingConfirmed) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Help with Organizing?"),
+          content: Text("Do you want to confirm your help with organizing?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("No", style: TextStyle(color: color.darkcolor),),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  isOrganizingConfirmed = true;
+                });
+                Navigator.pop(context);
+              },
+              child: Text("Yes", style: TextStyle(color: color.darkcolor)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Cancel Organizing?"),
+          content: Text("Are you sure you want to cancel?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("No", style: TextStyle(color: color.darkcolor)),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  isOrganizingConfirmed = false;
+                });
+                Navigator.pop(context);
+              },
+              child: Text("Yes", style: TextStyle(color: color.darkcolor)),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: color.bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: color.darkcolor),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: Stack(
+        alignment: Alignment.topCenter,
         children: [
-          /// 🔹 Background Decor
-          DecoratedBox(
+          /// 🔹 Full Gradient Background
+          Container(
             decoration: BoxDecoration(
-              color: color.bgColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
+              gradient: color.goldGradient,
             ),
-            child: SizedBox(height: 80, width: double.infinity),
           ),
 
-          /// 🔹 Main Content
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 20),
-
-                  /// 🔹 IMAGE SECTION
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/img.png',
-                      width: double.infinity,
-                      height: 150,
-                      fit: BoxFit.cover,
-                    ),
+          /// 🔹 Top Title
+          Padding(
+            padding: EdgeInsets.only(top: 75),
+            child: Column(
+              children: [
+                Text(
+                  "WHAT DO U WANNA HELP",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  SizedBox(height: 30),
-
-                  /// 🔹 LOCATION & TIME
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Ain taya',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: color.darkcolor,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '  15 min',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "WITH?",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  SizedBox(height: 40),
-
-                  /// 🔹 HELP BUTTONS SECTION
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: color.darkcolor, width: 1.5),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        _helpButton('Food', Foodpage(), helpStatus['Food']!),
-                        _helpButton('Money', PaymentScreen(), helpStatus['Money']!),
-                        _helpButton('Transportation', TransportSelectionScreen(), helpStatus['Transportation']!),
-                        _helpButton(
-                          'Utensils',
-                          Utensilist(utensils: [
-                            {"name": "Assiette", "needed": 20, "available": 15},
-                            {"name": "Fourchette", "needed": 20, "available": 10},
-                            {"name": "Marmite", "needed": 2, "available": 1},
-                            {"name": "Bol", "needed": 10, "available": 5},
-                            {"name": "Cuillère", "needed": 5, "available": 2},
-                          ]),
-                          helpStatus['Utensils']!,
-                        ),
-                        _helpButton('Organizing', Organization(), helpStatus['Organizing']!),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
+          ),
+
+          Column(
+            children: [
+              SizedBox(
+                height: 200,
+              ),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 50),
+                      Text(
+                        'Ain taya  15 min',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: color.darkcolor,
+                        ),
+                      ),
+                      SizedBox(height: 30),
+
+                      /// 🔹 Help Buttons
+                      _helpButton('Food', Foodpage()),
+                      _helpButton('Money', PaymentScreen()),
+                      _helpButton('Transportation', null, isPopup: true),
+                      _helpButton('Utensils', UtensilLoanScreen()),
+                      _organizingButton(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+              ),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/img.png'),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  /// 🔹 CUSTOM HELP BUTTON WIDGET
-  Widget _helpButton(String title, Widget page, bool isHelped) {
+  /// 🔹 Custom Help Button Widget
+  Widget _helpButton(String title, Widget? page, {bool isPopup = false}) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 6),
       child: Container(
         decoration: BoxDecoration(
-          color: color.bgColor,
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(color: Colors.black, width: 1.2),
         ),
         child: ListTile(
           title: Text(
             title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
           ),
-          trailing: isHelped
-              ? Icon(Icons.check_circle, color: Colors.green, size: 50)
-              : ElevatedButton(
+          trailing: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => page),
-              ).then((_) => markHelped(title));
+              if (isPopup) {
+                showTransportSelectionPopup(context);
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => page!),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: color.darkcolor,
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(30),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             ),
             child: Text(
-              'Help',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              'Donate',
+              style: TextStyle(
+                color: color.darkcolor,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 🔹 Organizing Button
+  Widget _organizingButton() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(color: Colors.black, width: 1.2),
+        ),
+        child: ListTile(
+          title: Text(
+            'Organizing',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+          ),
+          trailing: ElevatedButton(
+            onPressed: toggleOrganizing,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            ),
+            child: Text(
+              isOrganizingConfirmed ? '✔' : 'Confirm',
+              style: TextStyle(
+                color: color.darkcolor,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
         ),

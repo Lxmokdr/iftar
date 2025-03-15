@@ -16,36 +16,95 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: color.lightbg,
       body: Stack(
         children: [
-          Column(
-            children: [
-              // Top Decorative Images
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Image.asset("assets/fanous.png", height: 100),
-                  Image.asset("assets/moon.png", height: 200),
-                  Image.asset("assets/star.png", height: 150),
-                  Image.asset("assets/fanous.png", height: 200),
-                  Image.asset("assets/star.png", height: 150),
-                ],
-              ),
-            ],
+          // Top Decorative Images
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.asset("assets/fanous.png", height: 100),
+                Image.asset("assets/moon.png", height: 200),
+                Image.asset("assets/star.png", height: 150),
+                Image.asset("assets/fanous.png", height: 200),
+                Image.asset("assets/star.png", height: 150),
+              ],
+            ),
           ),
 
-          // Animated Positioned Container
+          // Position the Toggle on Top of the Decorations
+          Positioned(
+            top: 40, // Adjusted height to overlay near the moon & stars
+            left: MediaQuery.of(context).size.width * 0.2,
+            right: MediaQuery.of(context).size.width * 0.2,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isVolunteer = true;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: isVolunteer ? color.goldGradient : null, // Apply gradient when selected
+                      color: !isVolunteer ? color.lightbg : null, // Default background when not selected
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text(
+                      "Volunteer",
+                      style: TextStyle(
+                        color: isVolunteer ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isVolunteer = false;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: !isVolunteer ? color.goldGradient : null, // Apply gradient when selected
+                      color: isVolunteer ? color.lightbg : null, // Default background when not selected
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text(
+                      "Restaurant",
+                      style: TextStyle(
+                        color: !isVolunteer ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+
+          // Animated Bottom Card (Login/Signup)
           AnimatedPositioned(
             duration: Duration(milliseconds: 500),
             curve: Curves.easeInOut,
             bottom: 0,
             left: 0,
             right: 0,
-            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.75,
+            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.69,
             child: AnimatedContainer(
               duration: Duration(milliseconds: 500),
               curve: Curves.easeInOut,
               decoration: BoxDecoration(
-                color: color.bgColor,
+                gradient: color.goldGradient,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50),
                   topRight: Radius.circular(50),
@@ -59,38 +118,6 @@ class _AuthScreenState extends State<AuthScreen> {
                     isLogin ? 'Login' : 'Signup',
                     style: TextStyle(color: color.darkcolor, fontSize: 32),
                   ),
-                  SizedBox(height: 10),
-
-                  // Signup Type Toggle (Only for Signup)
-                  if (!isLogin)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ChoiceChip(
-                          label: Text("Volunteer"),
-                          selected: isVolunteer,
-                          selectedColor: color.darkcolor,
-                          backgroundColor: color.lightbg,
-                          onSelected: (selected) {
-                            setState(() {
-                              isVolunteer = true;
-                            });
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        ChoiceChip(
-                          label: Text("Restaurant"),
-                          selected: !isVolunteer,
-                          selectedColor: color.darkcolor,
-                          backgroundColor: color.lightbg,
-                          onSelected: (selected) {
-                            setState(() {
-                              isVolunteer = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
                   SizedBox(height: 10),
 
                   // Social Login (Only for Signup)
@@ -126,7 +153,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   // Animated Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: color.darkcolor,
+                      backgroundColor: color.bgColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -141,7 +168,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     },
                     child: Text(
                       isLogin ? 'Login' : 'Signup',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(color: color.darkcolor, fontSize: 16),
                     ),
                   ),
 
@@ -158,7 +185,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         },
                         child: Text(
                           isLogin ? "Signup" : "Login",
-                          style: TextStyle(color: color.darkcolor),
+                          style: TextStyle(color: color.bgColor),
                         ),
                       )
                     ],
@@ -171,6 +198,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
+
 }
 
 // Social Media Button

@@ -17,53 +17,96 @@ class _AddNeedState extends State<AddNeed> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: color.bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
+      body: Stack(
+        alignment: Alignment.topCenter,
         children: [
-          /// 🔹 IMAGE HEADER
+          /// 🔹 Full Gradient Background
           Container(
             decoration: BoxDecoration(
-              color: color.bgColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            padding: EdgeInsets.all(16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                'assets/img.png', // Replace with your actual image
-                width: double.infinity,
-                height: 150,
-                fit: BoxFit.cover,
-              ),
+              gradient: color.goldGradient,
             ),
           ),
-          SizedBox(height: 16),
 
-          /// 🔹 INPUT FIELDS
-          _buildInputField("Utensil name..", utensilController),
-          _buildInputField("Quantity..", quantityController),
+          /// 🔹 Top Title
+          Padding(
+              padding: EdgeInsets.only(top: 75),
+              child: Column(
+                children: [
+                  Text(
+                    "WHAT DO U WANNA HELP",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    "WITH?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              )
+          ),
 
-
-          /// 🔹 ACTION BUTTONS
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Column(
             children: [
-              _buildActionButton("Done", () {print("Done");
-              Navigator.push(context, MaterialPageRoute(builder: (_) => NeedsScreen()));
-              }),
+              SizedBox(
+                height: 200,
+              ),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        /// 🔹 INPUT FIELDS
+                        _buildInputField("Utensil name..", utensilController),
+                        _buildInputField("Quantity..", quantityController),
+
+
+                        /// 🔹 ACTION BUTTONS
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildActionButton("Done", () {print("Done");
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => NeedsScreen()));
+                            }),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+              ),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/img.png'),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -90,14 +133,29 @@ class _AddNeedState extends State<AddNeed> {
 
   /// 🔹 FUNCTION TO BUILD ACTION BUTTON
   Widget _buildActionButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color.darkcolor,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: color.goldGradient,
+        borderRadius: BorderRadius.circular(12), // Matches button shape
       ),
-      child: Text(text, style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => NeedsScreen()));
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent, // Transparent to show gradient
+          shadowColor: Colors.transparent, // Removes unwanted shadow
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+        ),
+        child: Text(
+          'Done',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
     );
   }
 }
+

@@ -1,92 +1,139 @@
 import 'package:flutter/material.dart';
 import '../classes/colors.dart';
+import '../common/button.dart';
 import 'help.dart'; // Ensure this file contains your color definitions
 
-class Foodpage extends StatelessWidget {
+class Foodpage extends StatefulWidget {
+  @override
+  State<Foodpage> createState() => _FoodpageState();
+}
+
+class _FoodpageState extends State<Foodpage> {
+  TextEditingController foodController = TextEditingController();
+  TextEditingController quantityController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+  TextEditingController needController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: color.bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: color.darkcolor),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
+      body: Stack(
+        alignment: Alignment.topCenter,
         children: [
-          /// 🔹 IMAGE HEADER
+          /// 🔹 Full Gradient Background
           Container(
             decoration: BoxDecoration(
-              color: color.bgColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            padding: EdgeInsets.all(16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                'assets/img.png', // Replace with your actual image
-                width: double.infinity,
-                height: 150,
-                fit: BoxFit.cover,
-              ),
+              gradient: color.goldGradient,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
 
-                SizedBox(height: 16),
-                _buildInputField('Food..'),
-                _buildInputField('Quantity..'),
-                _buildInputField('Arrival time..'),
-                _buildInputField('Need Transportation? Y/N'),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: color.darkcolor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+          /// 🔹 Top Title
+          Padding(
+              padding: EdgeInsets.only(top: 75),
+              child: Column(
+                children: [
+                  Text(
+                    "WHAT DO U WANNA HELP",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    textAlign: TextAlign.center,
                   ),
-                  child: Text(
-                    'Done',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  Text(
+                    "WITH?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              )
+          ),
+
+          Column(
+            children: [
+              SizedBox(
+                height: 200,
+              ),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+
+                        SizedBox(height: 16),
+                        buildInputField('Food..',foodController),
+                        buildInputField('Quantity..', quantityController),
+                        buildInputField('Arrival time..',timeController),
+                        buildInputField('Need Transportation? Y/N',needController),
+                        SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: color.goldGradient,
+                            borderRadius: BorderRadius.circular(12), // Matches button shape
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent, // Transparent to show gradient
+                              shadowColor: Colors.transparent, // Removes unwanted shadow
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                            ),
+                            child: Text(
+                              'Done',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+
+                        /// 🔹 FOOTER TEXT
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text('If you need transportation call the center'),
+                            Text('0557334515'),
+                          ],
+                        ),
+
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              SizedBox(
+                height: 150,
+              ),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/img.png'),
+              ),
+            ],
           ),
         ],
-      )
-    );
-  }
-
-  Widget _buildInputField(String hint) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: color.bgColor, // Adjust to match your UI
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: color.darkcolor),
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: hint,
-          border: InputBorder.none,
-        ),
       ),
     );
   }
