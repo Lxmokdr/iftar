@@ -5,18 +5,17 @@ import 'Historique.dart';
 import 'dashboard.dart';
 import 'helpers.dart';
 
-
 class dashboardNAv extends StatefulWidget {
   @override
-  _dashboardNAvState createState() => _dashboardNAvState();
+  _DashboardNavState createState() => _DashboardNavState();
 }
 
-class _dashboardNAvState extends State<dashboardNAv> {
+class _DashboardNavState extends State<dashboardNAv> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
 
   void _nextPage() {
-    if (_currentPage < 2) {
+    if (_currentPage < 3) { // Changed from 2 to 3
       _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
     }
   }
@@ -45,7 +44,6 @@ class _dashboardNAvState extends State<dashboardNAv> {
               HistoriqueScreen(),
               TransportWeekScreen(),
               DashboardScreen(),
-
             ],
           ),
 
@@ -63,7 +61,7 @@ class _dashboardNAvState extends State<dashboardNAv> {
           // Right Arrow
           Positioned(
             right: 10,
-            child: _currentPage < 2
+            child: _currentPage < 3 // Changed from 2 to 3
                 ? IconButton(
               icon: Icon(Icons.arrow_forward, size: 30, color: Colors.black),
               onPressed: _nextPage,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import '../classes/colors.dart';
 
 class TransportSelectionPopup extends StatefulWidget {
@@ -7,10 +10,12 @@ class TransportSelectionPopup extends StatefulWidget {
 }
 
 class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
-  DateTime? fromDateTime;
-  DateTime? toDateTime;
+  DateTime? fromDate;
+  TimeOfDay? fromTime;
+  DateTime? toDate;
+  TimeOfDay? toTime;
 
-  Future<void> _selectDateTime(BuildContext context, bool isFrom) async {
+  Future<void> _selectDate(BuildContext context, bool isFromDate) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -19,13 +24,13 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Colors.orange, // Header background color
+            primaryColor: color.darkcolor,
             colorScheme: ColorScheme.light(
-              primary: color.darkcolor, // Selected date color
-              onPrimary: Colors.white, // Text on selected date
-              onSurface: Colors.black, // Text on other dates
+              primary: color.darkcolor,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
-            dialogBackgroundColor: Colors.white, // Background color of picker
+            dialogBackgroundColor: Colors.white,
           ),
           child: child!,
         );
@@ -33,42 +38,80 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
     );
 
     if (pickedDate != null) {
-      TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.light().copyWith(
-              primaryColor: Colors.orange, // Header background color
-              colorScheme: ColorScheme.light(
-                primary: color.darkcolor, // Selected time color
-                onPrimary: Colors.white, // Text on selected time
-                onSurface: Colors.black, // Text on other times
-              ),
-              dialogBackgroundColor: Colors.white, // Background color of picker
+      setState(() {
+        if (isFromDate) {
+          fromDate = pickedDate;
+        } else {
+          toDate = pickedDate;
+        }
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, bool isFromTime) async {
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: color.darkcolor,
+            colorScheme: ColorScheme.light(
+              primary: color.darkcolor,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
-            child: child!,
-          );
-        },
-      );
-
-      if (pickedTime != null) {
-        DateTime finalDateTime = DateTime(
-          pickedDate.year,
-          pickedDate.month,
-          pickedDate.day,
-          pickedTime.hour,
-          pickedTime.minute,
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
         );
+      },
+    );
 
-        setState(() {
-          if (isFrom) {
-            fromDateTime = finalDateTime;
-          } else {
-            toDateTime = finalDateTime;
-          }
-        });
-      }
+    if (pickedTime != null) {
+      setState(() {
+        if (isFromTime) {
+          fromTime = pickedTime;
+        } else {
+          toTime = pickedTime;
+        }
+      });
+    }
+  }
+
+  Future<void> _saveAvailability() async {
+    if (fromDate == null || fromTime == null || toDate == null || toTime == null) return;
+
+    try {
+      String uid = FirebaseAuth.instance.currentUser!.uid;
+      DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(uid);
+
+      // Formatting full date and time
+      String fromFormattedDate = DateFormat('yyyy-MM-dd').format(fromDate!);
+      String fromFormattedTime = "${fromTime!.hour.toString().padLeft(2, '0')}:${fromTime!.minute.toString().padLeft(2, '0')}";
+
+      String toFormattedDate = DateFormat('yyyy-MM-dd').format(toDate!);
+      String toFormattedTime = "${toTime!.hour.toString().padLeft(2, '0')}:${toTime!.minute.toString().padLeft(2, '0')}";
+
+      Map<String, dynamic> availabilityEntry = {
+        "from": {
+          "date": fromFormattedDate,  // Saving the full date
+          "time": fromFormattedTime
+        },
+        "to": {
+          "date": toFormattedDate,  // Saving the full date
+          "time": toFormattedTime
+        }
+      };
+
+      await userDoc.update({
+        "availability": FieldValue.arrayUnion([availabilityEntry]),
+      });
+
+      print("Availability saved successfully!");
+      Navigator.pop(context);
+    } catch (e) {
+      print("Error saving availability: $e");
     }
   }
 
@@ -83,28 +126,53 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
         children: [
           TextField(
             readOnly: true,
-            onTap: () => _selectDateTime(context, true),
+            onTap: () => _selectDate(context, true),
             decoration: InputDecoration(
-              labelText: "From",
-              suffixIcon: Icon(Icons.calendar_today, color: color.darkcolor,),
+              labelText: "From Date",
+              suffixIcon: Icon(Icons.calendar_today, color: color.darkcolor),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-
             ),
             controller: TextEditingController(
-              text: fromDateTime != null ? "${fromDateTime!.toLocal()}".split(' ')[0] : "",
+              text: fromDate != null ? DateFormat('EEEE').format(fromDate!) : "",
             ),
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 10),
           TextField(
             readOnly: true,
-            onTap: () => _selectDateTime(context, false),
+            onTap: () => _selectTime(context, true),
             decoration: InputDecoration(
-              labelText: "To",
-              suffixIcon: Icon(Icons.calendar_today, color: color.darkcolor,),
+              labelText: "From Time",
+              suffixIcon: Icon(Icons.access_time, color: color.darkcolor),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
             controller: TextEditingController(
-              text: toDateTime != null ? "${toDateTime!.toLocal()}".split(' ')[0] : "",
+              text: fromTime != null ? fromTime!.format(context) : "",
+            ),
+          ),
+          SizedBox(height: 10),
+          TextField(
+            readOnly: true,
+            onTap: () => _selectDate(context, false),
+            decoration: InputDecoration(
+              labelText: "To Date",
+              suffixIcon: Icon(Icons.calendar_today, color: color.darkcolor),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            controller: TextEditingController(
+              text: toDate != null ? DateFormat('EEEE').format(toDate!) : "",
+            ),
+          ),
+          SizedBox(height: 10),
+          TextField(
+            readOnly: true,
+            onTap: () => _selectTime(context, false),
+            decoration: InputDecoration(
+              labelText: "To Time",
+              suffixIcon: Icon(Icons.access_time, color: color.darkcolor),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            controller: TextEditingController(
+              text: toTime != null ? toTime!.format(context) : "",
             ),
           ),
         ],
@@ -112,16 +180,12 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text("Cancel", style: TextStyle(color: color.darkcolor),),
+          child: Text("Cancel", style: TextStyle(color: color.darkcolor)),
         ),
         ElevatedButton(
-          onPressed: fromDateTime != null && toDateTime != null
-              ? () {
-            print("From: $fromDateTime, To: $toDateTime");
-            Navigator.pop(context);
-          }
-              : null,
-          child: Text("Done", style: TextStyle(color: color.darkcolor),),
+          onPressed: (fromDate != null && fromTime != null && toDate != null && toTime != null) ? _saveAvailability : null,
+          child: Text("Done", style: TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(backgroundColor: color.darkcolor),
         ),
       ],
     );

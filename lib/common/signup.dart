@@ -1,5 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../classes/colors.dart';
+import '../resto/needs.dart';
+import '../volunteer/listresto.dart';
+
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -7,8 +14,135 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool isLogin = false; // Toggle between Login & Signup
-  bool isVolunteer = true; // Toggle between Volunteer & Restaurant
+  bool isLogin = false;
+  bool isVolunteer = true;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  // Function for Signing Up
+  Future<void> _signUp() async {
+    try {
+      if (passwordController.text != confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Passwords do not match!")),
+        );
+        return;
+      }
+
+      // Request Location Permission
+      PermissionStatus status = await Permission.locationWhenInUse.request();
+      if (status.isDenied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Location permission is required for signup!")),
+        );
+        return;
+      }
+
+      if (status.isPermanentlyDenied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Location permission is permanently denied. Please enable it from settings."),
+            action: SnackBarAction(
+              label: "Open Settings",
+              onPressed: () => openAppSettings(),
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Ensure location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Location services are disabled. Please enable them.")),
+        );
+        return;
+      }
+
+      // Get Current Location
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Firebase Authentication
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      // Save User to Firestore
+      await _firestore.collection("users").doc(userCredential.user!.uid).set({
+        "email": emailController.text.trim(),
+        "role": isVolunteer ? "volunteer" : "restaurant",
+        "volunteers": 0,
+        "money": 0,
+        "name": nameController.text.trim(),
+        "phone": phoneController.text.trim(),
+        "location": {
+          "latitude": position.latitude,
+          "longitude": position.longitude,
+        },
+      });
+
+      // Navigate to the appropriate role-based screen
+      _navigateToRoleScreen(isVolunteer ? "volunteer" : "restaurant");
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Signup Failed: ${e.toString()}")),
+      );
+    }
+  }
+
+
+  // Function for Logging In
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      DocumentSnapshot userDoc = await _firestore.collection("users").doc(userCredential.user!.uid).get();
+      String role = userDoc["role"];
+
+      _navigateToRoleScreen(role);
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login Failed: ${e.toString()}")),
+      );
+    }
+  }
+
+  // Navigate to the Correct Role-Based Screen
+  void _navigateToRoleScreen(String role) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => role == "volunteer" ? IftarScreen() : NeedsScreen(),
+      ),
+    );
+  }
+
+  Future<void> _requestLocationPermission() async {
+    PermissionStatus status = await Permission.location.request();
+
+    if (status.isGranted) {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      print("User location: ${position.latitude}, ${position.longitude}");
+    } else {
+      print("Location permission denied");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,93 +150,47 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: color.lightbg,
       body: Stack(
         children: [
-          // Top Decorative Images
+          // Background Decorations
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset("assets/fanous.png", height: 100),
                 Image.asset("assets/moon.png", height: 200),
                 Image.asset("assets/star.png", height: 150),
-                Image.asset("assets/fanous.png", height: 200),
+                Image.asset("assets/fanous.png", height: 100),
+                Image.asset("assets/moon.png", height: 200),
                 Image.asset("assets/star.png", height: 150),
               ],
             ),
           ),
 
-          // Position the Toggle on Top of the Decorations
+          // Toggle for Volunteer / Restaurant
           Positioned(
-            top: 40, // Adjusted height to overlay near the moon & stars
+            top: 40,
             left: MediaQuery.of(context).size.width * 0.2,
             right: MediaQuery.of(context).size.width * 0.2,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isVolunteer = true;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: isVolunteer ? color.goldGradient : null, // Apply gradient when selected
-                      color: !isVolunteer ? color.lightbg : null, // Default background when not selected
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Text(
-                      "Volunteer",
-                      style: TextStyle(
-                        color: isVolunteer ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                _roleToggleButton("Volunteer", true),
                 SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isVolunteer = false;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: !isVolunteer ? color.goldGradient : null, // Apply gradient when selected
-                      color: isVolunteer ? color.lightbg : null, // Default background when not selected
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Text(
-                      "Restaurant",
-                      style: TextStyle(
-                        color: !isVolunteer ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                _roleToggleButton("Restaurant", false),
               ],
             ),
           ),
 
-
-          // Animated Bottom Card (Login/Signup)
+          // Auth Form
           AnimatedPositioned(
             duration: Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
             bottom: 0,
             left: 0,
             right: 0,
-            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.69,
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
+            height: isLogin ? 400 : MediaQuery.of(context).size.height * 0.7,
+            child: Container(
               decoration: BoxDecoration(
                 gradient: color.goldGradient,
                 borderRadius: BorderRadius.only(
@@ -112,45 +200,19 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               padding: EdgeInsets.all(30),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    isLogin ? 'Login' : 'Signup',
-                    style: TextStyle(color: color.darkcolor, fontSize: 32),
-                  ),
+                  Text(isLogin ? 'Login' : 'Signup', style: TextStyle(color: color.darkcolor, fontSize: 32)),
                   SizedBox(height: 10),
 
-                  // Social Login (Only for Signup)
-                  if (!isLogin)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SocialButton("assets/google.png", 20),
-                        SizedBox(width: 20),
-                        SocialButton("assets/facebook.png", 40),
-                      ],
-                    ),
-
-                  SizedBox(height: isLogin ? 10 : 20),
-
-                  // Text Fields
-                  Column(
-                    children: [
-                      if (!isLogin)
-                        CustomTextField(
-                          Icons.business,
-                          isVolunteer ? "Full Name.." : "Restaurant Name..",
-                        ),
-                      if (!isLogin) CustomTextField(Icons.phone, "Phone Number.."),
-                      CustomTextField(Icons.email, "Email address.."),
-                      CustomTextField(Icons.lock, "Password..", isPassword: true),
-                      if (!isLogin) CustomTextField(Icons.lock, "Verify password..", isPassword: true),
-                    ],
-                  ),
+                  if (!isLogin) _customTextField(Icons.business, isVolunteer ? "Full Name.." : "Restaurant Name..", nameController),
+                  if (!isLogin) _customTextField(Icons.phone, "Phone Number..", phoneController),
+                  _customTextField(Icons.email, "Email address..", emailController),
+                  _customTextField(Icons.lock, "Password..", passwordController, isPassword: true),
+                  if (!isLogin) _customTextField(Icons.lock, "Verify password..", confirmPasswordController, isPassword: true),
 
                   SizedBox(height: 20),
 
-                  // Animated Button
+                  // Auth Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: color.bgColor,
@@ -158,35 +220,19 @@ class _AuthScreenState extends State<AuthScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                      elevation: 8,
-                      shadowColor: color.darkcolor.withOpacity(0.5),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        isLogin = !isLogin;
-                      });
-                    },
-                    child: Text(
-                      isLogin ? 'Login' : 'Signup',
-                      style: TextStyle(color: color.darkcolor, fontSize: 16),
-                    ),
+                    onPressed: isLogin ? _login : _signUp,
+                    child: Text(isLogin ? 'Login' : 'Signup', style: TextStyle(color: color.darkcolor, fontSize: 16)),
                   ),
 
-                  // Switch between Signup/Login
+                  // Toggle Between Signup & Login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(isLogin ? "Don't have an account? " : "Already have an account? "),
                       TextButton(
-                        onPressed: () {
-                          setState(() {
-                            isLogin = !isLogin;
-                          });
-                        },
-                        child: Text(
-                          isLogin ? "Signup" : "Login",
-                          style: TextStyle(color: color.bgColor),
-                        ),
+                        onPressed: () => setState(() => isLogin = !isLogin),
+                        child: Text(isLogin ? "Signup" : "Login", style: TextStyle(color: color.bgColor)),
                       )
                     ],
                   ),
@@ -199,49 +245,42 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-}
-
-// Social Media Button
-class SocialButton extends StatelessWidget {
-  final String imagePath;
-  final double height;
-  SocialButton(this.imagePath, this.height);
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 15,
-      backgroundColor: Colors.white,
-      child: Image.asset(imagePath, height: height),
+  // Role Toggle Button
+  Widget _roleToggleButton(String text, bool isVolunteerOption) {
+    return GestureDetector(
+      onTap: () => setState(() => isVolunteer = isVolunteerOption),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: isVolunteer == isVolunteerOption ? color.goldGradient : null,
+          color: isVolunteer != isVolunteerOption ? color.lightbg : null,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isVolunteer == isVolunteerOption ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
-}
 
-// Custom Text Field
-class CustomTextField extends StatelessWidget {
-  final IconData icon;
-  final String hintText;
-  final bool isPassword;
-  CustomTextField(this.icon, this.hintText, {this.isPassword = false});
-
-  @override
-  Widget build(BuildContext context) {
+  // Custom Text Field
+  Widget _customTextField(IconData icon, String hint, TextEditingController controller, {bool isPassword = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.black),
-          hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey[600]),
+          hintText: hint,
           filled: true,
           fillColor: Colors.transparent,
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.black, width: 1.5),
-          ),
+          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black, width: 1.5)),
         ),
       ),
     );

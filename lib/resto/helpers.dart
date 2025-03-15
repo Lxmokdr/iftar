@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../classes/colors.dart';
 
 class StatisticsTodayScreen extends StatefulWidget {
   @override
@@ -7,81 +11,85 @@ class StatisticsTodayScreen extends StatefulWidget {
 }
 
 class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
-  // All possible categories to filter by.
   final List<String> allCategories = ["Food", "Utensils", "Money", "Organizing"];
-
-  // Current search term in the bottom sheet.
   String _searchTerm = "";
-
-  // Currently selected category filter (null = no filter).
   String? selectedCategory;
 
-  // Sample data structure: each helper has name, type, quantity, unit, phone.
-  final List<Map<String, String>> helpersList = [
-    {
-      'name': 'Menas Mohammed',
-      'type': 'Money',
-      'quantity': '250',
-      'unit': 'da',
-      'phone': '0557334515',
-    },
-    {
-      'name': 'Alice Johnson',
-      'type': 'Utensils',
-      'quantity': '2',
-      'unit': 'marmite',
-      'phone': '0557331234',
-    },
-    {
-      'name': 'Bob Smith',
-      'type': 'Food',
-      'quantity': '5',
-      'unit': 'sandwiches',
-      'phone': '0557339876',
-    },
-    {
-      'name': 'Charlie Brown',
-      'type': 'Organizing',
-      'quantity': '1',
-      'unit': 'event',
-      'phone': '0557334567',
-    },
-    {
-      'name': 'Dana White',
-      'type': 'Money',
-      'quantity': '300',
-      'unit': 'da',
-      'phone': '0551234567',
-    },
-  ];
+  List<Map<String, String>> helpersList = [];
+  bool isLoading = true;
 
-  // Returns a filtered list if a category is selected,
-  // otherwise returns the full list.
+  @override
+  void initState() {
+    super.initState();
+    fetchHelpers();
+  }
+
+  Future<void> fetchHelpers() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    final requestsRef = FirebaseFirestore.instance
+        .collection('requests')
+        .doc(currentUser.uid)
+        .collection('requests');
+
+    try {
+      QuerySnapshot requestsSnapshot = await requestsRef.get();
+      List<Map<String, String>> tempHelpers = [];
+
+      for (var requestDoc in requestsSnapshot.docs) {
+        Map<String, dynamic> requestData = requestDoc.data() as Map<String, dynamic>;
+
+        String? volunteerId = requestData['volunteer_uid'];
+        if (volunteerId == null) continue;
+
+        DocumentSnapshot volunteerDoc = await FirebaseFirestore.instance.collection('users').doc(volunteerId).get();
+        if (!volunteerDoc.exists) continue;
+
+        Map<String, dynamic> userData = volunteerDoc.data() as Map<String, dynamic>;
+
+        tempHelpers.add({
+          'name': userData['name'] ?? 'Unknown',
+          'phone': userData['phone'] ?? 'N/A',
+          'type': requestData['type'] ?? 'Unknown',
+          'quantity': requestData['quantity']?.toString() ?? 'Unknown',
+          'unit': requestData['unit'] ?? '',
+          'item': requestData['item'] ?? 'Unknown',
+          'method': requestData['method'] ?? 'Unknown',
+        });
+      }
+
+      setState(() {
+        helpersList = tempHelpers;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching helpers: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   List<Map<String, String>> get filteredHelpers {
     if (selectedCategory == null || selectedCategory!.isEmpty) {
       return helpersList;
     } else {
-      return helpersList
-          .where((helper) =>
-              (helper['type'] ?? '').toLowerCase() ==
-              selectedCategory!.toLowerCase())
-          .toList();
+      return helpersList.where((helper) =>
+      (helper['type'] ?? '').toLowerCase() == selectedCategory!.toLowerCase()).toList();
     }
   }
 
-  // Opens the bottom sheet to select a category (drop list).
   void _showFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
-      isScrollControlled: true, // Allows the sheet to go fullscreen if needed.
+      isScrollControlled: true,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (BuildContext context, setStateModal) {
-            // Filter categories based on _searchTerm
             final List<String> visibleCategories = allCategories
-                .where((cat) =>
-                    cat.toLowerCase().contains(_searchTerm.toLowerCase()))
+                .where((cat) => cat.toLowerCase().contains(_searchTerm.toLowerCase()))
                 .toList();
 
             return Padding(
@@ -89,22 +97,16 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
                 left: 16,
                 right: 16,
                 top: 16,
-                // Extra padding to accommodate the keyboard
                 bottom: MediaQuery.of(context).viewInsets.bottom + 16,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Title
                   Text(
                     'Select a category',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  // Search Bar
                   TextField(
                     onChanged: (value) {
                       setStateModal(() {
@@ -118,7 +120,6 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // List of filtered categories
                   Expanded(
                     child: ListView.builder(
                       itemCount: visibleCategories.length,
@@ -127,7 +128,6 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
                         return ListTile(
                           title: Text(category),
                           onTap: () {
-                            // Set selectedCategory and close bottom sheet
                             setState(() {
                               selectedCategory = category;
                             });
@@ -149,85 +149,34 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Screen background is white.
       backgroundColor: Colors.white,
-
-      // AppBar (fixed)
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color.fromARGB(255, 203, 140, 52),
-          ),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 203, 140, 52)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Statistics of Today:',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
-        actions: [
-          // Profile image in the AppBar.
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/pfp.jpg'),
-            ),
-          ),
-        ],
       ),
-
-      // Bottom Navigation Bar with margin, brown background, and rounded corners.
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.brown,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
-            elevation: 0,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-              BottomNavigationBarItem(icon: Icon(Icons.message), label: 'INBOX'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.add_circle_outline), label: 'POST'),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PROFILE'),
-            ],
-          ),
-        ),
-      ),
-
-      // Body with fixed header row and scrollable list below.
-      body: Column(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row with "List of helpers" + filter icon
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'List of helpers',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
-                // Only a filter icon to drop a list
                 IconButton(
                   icon: const Icon(Icons.tune, color: Colors.black),
                   onPressed: () => _showFilterBottomSheet(context),
@@ -235,8 +184,6 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
               ],
             ),
           ),
-
-          // Display the selected filter (if any)
           if (selectedCategory != null && selectedCategory!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -245,8 +192,6 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
                 style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
               ),
             ),
-
-          // Scrollable list of helper cards (filtered)
           Expanded(
             child: ListView.builder(
               itemCount: filteredHelpers.length,
@@ -260,18 +205,10 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
     );
   }
 
-  // Builds a card for each helper, e.g. "Menas Mohammed" with "Money: 250 da"
-  // and phone number below that, then Confirm/Reject buttons at the bottom.
   Widget _buildHelperCard(Map<String, String> helper) {
-    final name = helper['name'] ?? '';
-    final type = helper['type'] ?? '';
-    final quantity = helper['quantity'] ?? '';
-    final unit = helper['unit'] ?? '';
-    final phone = helper['phone'] ?? '';
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Color.fromARGB(100, 255, 197, 54),
+      color: color.bgColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -279,63 +216,40 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title: Name
-            Text(
-              name,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            // Subtitle: "type: quantity unit"
-            Text(
-              "$type: $quantity $unit",
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
+            Text(helper['name'] ?? 'Unknown',
+                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: color.darkcolor)),
+            Text(helper['phone'] ?? 'N/A',
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
             const SizedBox(height: 8),
-            // Phone number on its own line
-            Text(
-              phone,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-            const Divider(),
-            // Confirm/Reject buttons
+            Text("Type: ${helper['type']}", style: GoogleFonts.poppins(fontSize: 14)),
+            if (helper['type'] == 'money')
+              Text("Method: ${helper['method']}", style: GoogleFonts.poppins(fontSize: 14)),
+            if (helper['type'] != 'money')
+              Text("Item: ${helper['item']}", style: GoogleFonts.poppins(fontSize: 14)),
+            Text("Quantity: ${helper['quantity']} ${helper['unit']}",
+                style: GoogleFonts.poppins(fontSize: 14)),
+
+            const SizedBox(height: 12),
+
+            // Buttons for confirmation and rejection
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // TODO: Confirm action
-                  },
+                  onPressed: () => _confirmHelper(helper),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    backgroundColor: Colors.green, // Confirm button color
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: Text(
-                    'Confirm',
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
+                  child: Text("Confirm", style: GoogleFonts.poppins(color: Colors.white)),
                 ),
-                const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () {
-                    // TODO: Reject action
-                  },
+                  onPressed: () => _rejectHelper(helper),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    backgroundColor: Colors.red, // Reject button color
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: Text(
-                    'Reject',
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
+                  child: Text("Reject", style: GoogleFonts.poppins(color: Colors.white)),
                 ),
               ],
             ),
@@ -344,4 +258,59 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
       ),
     );
   }
+
+  void _confirmHelper(Map<String, dynamic> helper) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    try {
+      if (helper['type'] == 'money') {
+        DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(currentUser.uid);
+        DocumentSnapshot userSnapshot = await userDoc.get();
+        int currentMoney = (userSnapshot['money'] ?? 0) as int;
+        int addedMoney = int.tryParse(helper['quantity'].toString()) ?? 0;
+
+        if (addedMoney > 0) {
+          await userDoc.update({'money': currentMoney + addedMoney});
+          print("✅ Confirmed: ${helper['name']}, added $addedMoney to money field");
+        } else {
+          print("⚠️ Invalid money amount: ${helper['quantity']}");
+        }
+      } else {
+        final utensilsRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('utensils');
+
+        QuerySnapshot utensilSnapshot = await utensilsRef
+            .where('name', isEqualTo: helper['item'])
+            .limit(1)
+            .get();
+
+        if (utensilSnapshot.docs.isNotEmpty) {
+          DocumentSnapshot utensilDoc = utensilSnapshot.docs.first;
+          int currentAvailable = (utensilDoc['available'] ?? 0) as int;
+          int addedQuantity = int.tryParse(helper['quantity'].toString()) ?? 0;
+
+          if (addedQuantity > 0) {
+            await utensilDoc.reference.update({'available': currentAvailable + addedQuantity});
+            print("✅ Confirmed: ${helper['name']}, added $addedQuantity ${helper['unit']} to ${helper['item']}");
+          } else {
+            print("⚠️ Invalid quantity: ${helper['quantity']}");
+          }
+        } else {
+          print("⚠️ No matching utensil found for ${helper['item']}");
+        }
+      }
+    } catch (e) {
+      print("❌ Error confirming helper: $e");
+    }
+  }
+
+
+  void _rejectHelper(Map<String, dynamic> helper) {
+    print("Rejected: ${helper['name']}");
+    // Add logic to remove request if needed
+  }
+
 }

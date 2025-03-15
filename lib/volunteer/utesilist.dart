@@ -5,8 +5,9 @@ import 'package:iftar/volunteer/utensils.dart';
 import 'help.dart';
 
 class Utensilist extends StatefulWidget {
+  final String uid; // 🔹 Take UID as a parameter
   final List<Map<String, dynamic>> utensils;
-  Utensilist({required this.utensils});
+  Utensilist({super.key, required this.utensils, required this.uid});
 
   @override
   _UtensilistState createState() => _UtensilistState();
@@ -83,7 +84,7 @@ class _UtensilistState extends State<Utensilist> {
                 ),
                 itemBuilder: (context, index) {
                   var utensil = utensils[index];
-                  Color bgColor = getBackgroundColor(utensil["needed"], utensil["available"]);
+                  Color bgColor = getBackgroundColor(utensil["quantity"], utensil["available"]);
 
                   return Container(
                     alignment: Alignment.center,
@@ -101,7 +102,7 @@ class _UtensilistState extends State<Utensilist> {
                         ),
                         SizedBox(height: 6), // Added spacing
                         Text(
-                          "Needed: ${utensil["needed"]}",
+                          "quantity: ${utensil["quantity"]}",
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                         Text(
@@ -123,7 +124,7 @@ class _UtensilistState extends State<Utensilist> {
             children: [
               _buildActionButton("Done", () {
                 print("Done");
-                Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen(uid: widget.uid,)));
               }),
 
             ],

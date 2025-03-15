@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "19504670539",
+    "project_id": "iftar-e6e12",
+    "storage_bucket": "iftar-e6e12.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19504670539:android:deb70d553e85d96095eace",
+        "android_client_info": {
+          "package_name": "com.example.iftar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEI3f0BBOiFLJjU_v0SEoeDUCCbfKTaTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

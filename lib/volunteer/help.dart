@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:iftar/volunteer/organazing.dart';
 import 'package:iftar/volunteer/payerment.dart';
 import 'package:iftar/volunteer/transportation.dart';
@@ -7,14 +8,16 @@ import '../classes/colors.dart';
 import 'foodpage.dart';
 
 class IftarHelpScreen extends StatefulWidget {
+  final String uid; // 🔹 Take UID as a parameter
+
+  IftarHelpScreen({required this.uid});
+
   @override
   _IftarHelpScreenState createState() => _IftarHelpScreenState();
 }
 
 class _IftarHelpScreenState extends State<IftarHelpScreen> {
-
   bool isOrganizingConfirmed = false;
-
 
   void toggleOrganizing() {
     if (!isOrganizingConfirmed) {
@@ -26,13 +29,14 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("No", style: TextStyle(color: color.darkcolor),),
+              child: Text("No", style: TextStyle(color: color.darkcolor)),
             ),
             TextButton(
               onPressed: () {
                 setState(() {
                   isOrganizingConfirmed = true;
                 });
+                _updateVolunteerCount(1); // 🔹 Increase volunteers in Firestore
                 Navigator.pop(context);
               },
               child: Text("Yes", style: TextStyle(color: color.darkcolor)),
@@ -56,6 +60,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
                 setState(() {
                   isOrganizingConfirmed = false;
                 });
+                _updateVolunteerCount(-1); // 🔹 Decrease volunteers in Firestore
                 Navigator.pop(context);
               },
               child: Text("Yes", style: TextStyle(color: color.darkcolor)),
@@ -63,6 +68,27 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
           ],
         ),
       );
+    }
+  }
+
+  /// 🔹 Function to update volunteers count in Firestore
+  void _updateVolunteerCount(int increment) async {
+    try {
+      DocumentReference userRef =
+      FirebaseFirestore.instance.collection('users').doc(widget.uid);
+
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(userRef);
+
+        if (snapshot.exists) {
+          int currentCount = (snapshot['volunteers'] ?? 0);
+          transaction.update(userRef, {'volunteers': currentCount + increment});
+        }
+      });
+
+      print("Volunteer count updated successfully!");
+    } catch (e) {
+      print("Error updating volunteers: $e");
     }
   }
 
@@ -108,9 +134,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
 
           Column(
             children: [
-              SizedBox(
-                height: 200,
-              ),
+              SizedBox(height: 200),
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -137,10 +161,10 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
                       SizedBox(height: 30),
 
                       /// 🔹 Help Buttons
-                      _helpButton('Food', Foodpage()),
-                      _helpButton('Money', PaymentScreen()),
+                      _helpButton('Food', Foodpage(uid: widget.uid)),
+                      _helpButton('Money', PaymentScreen(uid: widget.uid)),
                       _helpButton('Transportation', null, isPopup: true),
-                      _helpButton('Utensils', UtensilLoanScreen()),
+                      _helpButton('Utensils', UtensilLoanScreen(uid: widget.uid)),
                       _organizingButton(),
                     ],
                   ),
@@ -150,9 +174,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
           ),
           Column(
             children: [
-              SizedBox(
-                height: 150,
-              ),
+              SizedBox(height: 150),
               CircleAvatar(
                 radius: 50,
                 backgroundImage: AssetImage('assets/img.png'),
@@ -186,7 +208,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
               } else {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => page!),
+                  MaterialPageRoute(builder: (_) => page!), // 🔹 Pass UID to the page
                 );
               }
             },

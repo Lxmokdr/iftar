@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:iftar/volunteer/utensils.dart';
 import '../classes/colors.dart';
+import '../firebase/needs.dart';
 import 'addneed.dart';
 
 class NeedsScreen extends StatefulWidget {
@@ -10,6 +13,19 @@ class NeedsScreen extends StatefulWidget {
 
 class _NeedsScreenState extends State<NeedsScreen> {
   int currentPage = 0;
+  List<String> needs = [];
+  String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
+
+  @override
+  void initState() {
+    super.initState();
+    String uid = FirebaseAuth.instance.currentUser?.uid ?? "";
+    fetchUtensils(uid, (fetchedNeeds) {
+      setState(() {
+        needs = fetchedNeeds;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +46,6 @@ class _NeedsScreenState extends State<NeedsScreen> {
   }
 
   Widget _buildNeedsPage(BuildContext context) {
-    final List<String> needs = [
-      "20 Assiette", "2 Marmites", "20 Bolle", "20 Fourchette", "2 cuilleres",
-    ];
-
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
@@ -108,14 +120,12 @@ class _NeedsScreenState extends State<NeedsScreen> {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        /// 🔹 Full Gradient Background
         Container(
           decoration: BoxDecoration(
             gradient: color.goldGradient,
           ),
         ),
 
-        /// 🔹 Top Title
         Padding(
             padding: EdgeInsets.only(top: 75),
             child: Column(
@@ -135,9 +145,7 @@ class _NeedsScreenState extends State<NeedsScreen> {
 
         Column(
           children: [
-            SizedBox(
-              height: 200,
-            ),
+            SizedBox(height: 200),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -149,68 +157,44 @@ class _NeedsScreenState extends State<NeedsScreen> {
                   ),
                 ),
                 padding: EdgeInsets.all(20),
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 15,
-                          ),
-                        // Title & Navigation
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  _buildArrowButton(Icons.arrow_back, () {
-                                    setState(() {
-                                      currentPage = 0;
-                                    });
-                                  }),
-                                  SizedBox(width: 10),
-                                  Text("Set Needs", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-
-                          _buildInputField("Set max needed money", ".......DZD"),
-                          SizedBox(height: 10),
-                          _buildInputField("Set max needed Organizers", "......."),
-                          SizedBox(height: 30),
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: Text("Block Food", style: TextStyle(color: Colors.white)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            _buildArrowButton(Icons.arrow_back, () {
+                              setState(() {
+                                currentPage = 0;
+                              });
+                            }),
+                            SizedBox(width: 10),
+                            Text("Set Needs", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    _buildInputField("Set max needed money", ".......DZD"),
+                    SizedBox(height: 10),
+                    _buildInputField("Set max needed Organizers", "......."),
+                    SizedBox(height: 30),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text("Block Food", style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-        Column(
-          children: [
-            SizedBox(
-              height: 150,
-            ),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/img.png'),
             ),
           ],
         ),
@@ -248,4 +232,5 @@ class _NeedsScreenState extends State<NeedsScreen> {
       ],
     );
   }
+
 }

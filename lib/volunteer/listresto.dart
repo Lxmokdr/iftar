@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iftar/volunteer/transportation.dart';
 import '../classes/colors.dart';
+import '../firebase/fetchRestos.dart';
 import 'help.dart';
 
 class IftarScreen extends StatefulWidget {
@@ -24,29 +26,11 @@ class _IftarScreenState extends State<IftarScreen> {
               children: [
                 Text(
                   'Iftar',
-                  style: TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold, color: color.darkcolor),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color.darkcolor),
                 ),
                 IconButton(
                   icon: Icon(Icons.language, color: color.darkcolor),
                   onPressed: () {},
-                ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Full Name',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                ),
-                SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.location_on, color: color.darkcolor),
-                    Text('Savar, Dhaka', style: TextStyle(fontSize: 16)),
-                  ],
                 ),
               ],
             ),
@@ -72,10 +56,28 @@ class _IftarScreenState extends State<IftarScreen> {
             ),
             SizedBox(height: 12),
             Expanded(
-              child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return RestaurantCard();
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: getRestaurants(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error loading restaurants.'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No restaurants available.'));
+                  }
+
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      var restaurant = snapshot.data![index];
+                      return RestaurantCard(
+                        name: restaurant['name'] ?? 'Unknown',
+                        address: restaurant['address'] ?? 'Unknown Location',
+                        uid: restaurant['uid'] ?? '', // Ensure UID is included
+                      );
+                    },
+                  );
                 },
               ),
             ),
@@ -83,7 +85,7 @@ class _IftarScreenState extends State<IftarScreen> {
             Center(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: color.goldGradient, // Apply your custom gradient
+                  gradient: color.goldGradient,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -101,13 +103,12 @@ class _IftarScreenState extends State<IftarScreen> {
   }
 }
 
-class RestaurantCard extends StatefulWidget {
-  @override
-  State<RestaurantCard> createState() => _RestaurantCardState();
-}
+class RestaurantCard extends StatelessWidget {
+  final String name;
+  final String address;
+  final String uid;
 
-class _RestaurantCardState extends State<RestaurantCard> {
-  double progressLevel = 0.6; // Example level, can be changed dynamically
+  const RestaurantCard({required this.name, required this.address, required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -127,88 +128,29 @@ class _RestaurantCardState extends State<RestaurantCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Ain Taya', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text('15 min', style: TextStyle(color: Colors.grey)),
+                  Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(address, style: TextStyle(color: Colors.grey)), // Fix: Address now displays properly
                   SizedBox(height: 6),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: color.goldGradient,
-                      borderRadius: BorderRadius.circular(50), // Matches button shape
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                     ),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => IftarHelpScreen()),
-                        );
-                      },
-                      child: Text('Help', style: TextStyle(color: Colors.white)),
-                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => IftarHelpScreen(uid: uid)), // Pass UID here
+                      );
+                    },
+                    child: Text('Help', style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
             ),
             Icon(Icons.location_pin, color: color.darkcolor, size: 45),
-            SizedBox(
-              width: 30,
-            ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: CircularProgressIndicator(
-                    value: progressLevel, // This controls the level
-                    strokeWidth: 5,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan), // Change color as needed
-                  ),
-                ),
-                Text(
-                  '${(progressLevel * 100).toInt()}%', // Show percentage inside
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
           ],
         ),
       ),
-    );
-  }
-
-  void _showBookingConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirm Booking"),
-          content: Text("Are you sure you want to book this Iftar?"),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(backgroundColor: color.darkcolor),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Yes", style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(backgroundColor: color.darkcolor),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("No", style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
     );
   }
 }
