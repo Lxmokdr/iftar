@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../classes/colors.dart';
 import '../common/button.dart';
-import 'help.dart'; // Ensure this file contains your color definitions
+import 'help.dart'; // تأكد من أن هذا الملف يحتوي على تعريفات الألوان
 
 class Foodpage extends StatefulWidget {
   final String uid;
@@ -18,8 +18,7 @@ class Foodpage extends StatefulWidget {
 class _FoodpageState extends State<Foodpage> {
   TextEditingController foodController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
-  String? volunteerUid; // Current User UID
-
+  String? volunteerUid; // معرّف المستخدم الحالي
 
   @override
   void initState() {
@@ -37,7 +36,7 @@ class _FoodpageState extends State<Foodpage> {
   Future<void> submitRequest() async {
     if (foodController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a food item.")),
+        const SnackBar(content: Text("يرجى إدخال نوع الطعام.")),
       );
       return;
     }
@@ -45,14 +44,14 @@ class _FoodpageState extends State<Foodpage> {
     int quantity = int.tryParse(quantityController.text) ?? 0;
     if (quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid quantity.")),
+        const SnackBar(content: Text("يرجى إدخال كمية صحيحة.")),
       );
       return;
     }
 
     if (volunteerUid == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not authenticated!")),
+        const SnackBar(content: Text("المستخدم غير مصادق عليه!")),
       );
       return;
     }
@@ -69,23 +68,23 @@ class _FoodpageState extends State<Foodpage> {
           .set({
         'volunteer_uid': volunteerUid,
         'type': 'food',
-        'item': foodController.text, // ✅ Corrected
-        'quantity': quantity, // ✅ Corrected
+        'item': foodController.text,
+        'quantity': quantity,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Request submitted successfully!")),
+        const SnackBar(content: Text("تم إرسال الطلب بنجاح!")),
       );
 
-      // ✅ Clear input fields correctly
+      // مسح الحقول بعد الإرسال
       foodController.clear();
       quantityController.clear();
 
     } catch (e) {
-      print("Error submitting request: $e");
+      print("خطأ في إرسال الطلب: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to submit request!")),
+        const SnackBar(content: Text("فشل في إرسال الطلب!")),
       );
     }
   }
@@ -96,25 +95,20 @@ class _FoodpageState extends State<Foodpage> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          /// 🔹 Full Gradient Background
+          /// 🔹 الخلفية بتدرج لوني
           Container(
             decoration: BoxDecoration(
               gradient: color.goldGradient,
             ),
           ),
 
-          /// 🔹 Top Title
+          /// 🔹 العنوان العلوي
           const Padding(
             padding: EdgeInsets.only(top: 75),
             child: Column(
               children: [
                 Text(
-                  "WHAT DO U WANNA HELP",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "WITH?",
+                  "بماذا ترغب في المساعدة؟",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
@@ -142,8 +136,8 @@ class _FoodpageState extends State<Foodpage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 16),
-                        buildInputField('Food..', foodController),
-                        buildInputField('Quantity..', quantityController),
+                        buildInputField('نوع الطعام..', foodController),
+                        buildInputField('الكمية..', quantityController),
                         const SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
@@ -167,18 +161,18 @@ class _FoodpageState extends State<Foodpage> {
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                             ),
                             child: const Text(
-                              'Done',
+                              'تم',
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                           ),
                         ),
                         const Spacer(),
 
-                        /// 🔹 FOOTER TEXT
+                        /// 🔹 نص التذييل
                         const Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text('If you need transportation call the center'),
+                            Text('إذا كنت بحاجة إلى وسيلة نقل، اتصل بالمركز'),
                             Text('0557334515'),
                           ],
                         ),

@@ -18,15 +18,14 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
     fetchUsers();
   }
 
-  // Fetch users from Firestore and filter based on availability
   void fetchUsers() async {
     try {
       FirebaseFirestore.instance.collection('users').get().then((querySnapshot) {
         List<Map<String, dynamic>> allUsers = [];
         List<Map<String, dynamic>> availableNow = [];
 
-        String currentDay = DateFormat('EEEE').format(DateTime.now()); // e.g., "Monday"
-        String currentTime = DateFormat('HH:mm').format(DateTime.now()); // e.g., "15:30"
+        String currentDay = DateFormat('EEEE', 'ar').format(DateTime.now());
+        String currentTime = DateFormat('HH:mm').format(DateTime.now());
 
         for (var doc in querySnapshot.docs) {
           var userData = doc.data();
@@ -42,12 +41,6 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
                   availableNow.add(userData);
                 }
 
-                // Update availability (example)
-                // If some condition is met, update the availability in Firestore
-                if (someConditionToUpdateAvailability(userData)) {
-                  updateUserAvailability(doc.id, userData);
-                }
-
                 allUsers.add(userData);
               }
             }
@@ -60,8 +53,7 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
         });
       });
     } catch (e) {
-      print("Error fetching users: $e");
-      // Optionally, show an error message to the user
+      print("خطأ في جلب المستخدمين: $e");
     }
   }
 
@@ -71,31 +63,6 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
     DateTime now = DateTime.now();
 
     return now.isAfter(fromDateTime) && now.isBefore(toDateTime);
-  }
-
-
-// This function simulates a condition to update a user's availability.
-  bool someConditionToUpdateAvailability(Map<String, dynamic> userData) {
-    // Add logic for when you want to update the user's availability
-    return true; // For example, always update availability
-  }
-
-  void updateUserAvailability(String userId, Map<String, dynamic> updatedUserData) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({
-        'availability': updatedUserData['availability'], // Update availability or any other field
-      });
-      print("User availability updated successfully!");
-    } catch (e) {
-      print("Error updating user availability: $e");
-    }
-  }
-
-  DateTime stringToDateTime(String dateString, String timeString) {
-    return DateTime.parse(dateString.replaceAll('_', '-') + 'T' + timeString);
   }
 
   @override
@@ -110,7 +77,7 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Available Users',
+          'المستخدمون المتاحون',
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -125,7 +92,7 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Users Available Now:',
+              'المستخدمون المتاحون الآن:',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -134,10 +101,9 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
             ),
             const SizedBox(height: 8),
 
-            // List of users available now
             Expanded(
               child: usersAvailableNow.isEmpty
-                  ? Center(child: Text("No users available at this time."))
+                  ? Center(child: Text("لا يوجد مستخدمون متاحون في هذا الوقت."))
                   : ListView.builder(
                 itemCount: usersAvailableNow.length,
                 itemBuilder: (context, index) {
@@ -149,9 +115,8 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
 
             const SizedBox(height: 16),
 
-
             Text(
-              'Users with Availability:',
+              'المستخدمون الذين لديهم توفر:',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -160,10 +125,9 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
             ),
             const SizedBox(height: 8),
 
-            // List of users with availability
             Expanded(
               child: usersWithAvailability.isEmpty
-                  ? Center(child: Text("No users with availability."))
+                  ? Center(child: Text("لا يوجد مستخدمون لديهم توفر."))
                   : ListView.builder(
                 itemCount: usersWithAvailability.length,
                 itemBuilder: (context, index) {
@@ -178,7 +142,6 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
     );
   }
 
-  // Builds a card for each user
   Widget _buildUserCard(Map<String, dynamic> user, bool isAvailableNow) {
     return Container(
       width: double.infinity,
@@ -199,20 +162,20 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            user['name'] ?? "Unknown User",
+            user['name'] ?? "مستخدم غير معروف",
             style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
-            "Availability:",
+            "التوفر:",
             style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: (user['availability'] as List<dynamic>).map((slot) {
               return Text(
-                "From: ${slot['from']['date']} at ${slot['from']['time']} \n"
-                    "To: ${slot['to']['date']} at ${slot['to']['time']}",
+                "من: ${slot['from']['date']} في ${slot['from']['time']} \n"
+                    "إلى: ${slot['to']['date']} في ${slot['to']['time']}",
                 style: GoogleFonts.poppins(fontSize: 14),
               );
             }).toList(),
@@ -221,5 +184,4 @@ class _TransportWeekScreenState extends State<TransportWeekScreen> {
       ),
     );
   }
-
 }

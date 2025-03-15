@@ -7,7 +7,7 @@ import '../classes/colors.dart';
 import 'help.dart';
 
 class PaymentScreen extends StatefulWidget {
-  final String uid; // 🔹 Restaurant UID
+  final String uid;
 
   PaymentScreen({required this.uid});
   @override
@@ -17,9 +17,9 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   String? selectedMethod;
   TextEditingController amountController = TextEditingController();
-  final List<String> paymentMethods = ["CCP", "Espèces"];
+  final List<String> paymentMethods = ["CCP", "نقداً"];
   bool isAmountEntered = false;
-  String? volunteerUid; // Current User UID
+  String? volunteerUid;
 
   @override
   void initState() {
@@ -34,24 +34,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
   }
 
-  Future<void> submitRequest() async {  
+  Future<void> submitRequest() async {
     if (amountController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter an amount.")),
+        const SnackBar(content: Text("يرجى إدخال المبلغ.")),
       );
       return;
     }
 
     if (selectedMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a payment method.")),
+        const SnackBar(content: Text("يرجى اختيار طريقة الدفع.")),
       );
       return;
     }
 
     if (volunteerUid == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not authenticated!")),
+        const SnackBar(content: Text("المستخدم غير مسجل الدخول!")),
       );
       return;
     }
@@ -74,7 +74,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Request submitted successfully!")),
+        const SnackBar(content: Text("تم إرسال الطلب بنجاح!")),
       );
 
       setState(() {
@@ -84,7 +84,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to submit request!")),
+        const SnackBar(content: Text("فشل في إرسال الطلب!")),
       );
     }
   }
@@ -95,18 +95,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          /// 🔹 Full Gradient Background
           Container(
             decoration: BoxDecoration(
               gradient: color.goldGradient,
             ),
           ),
-
-          /// 🔹 Top Title
           Padding(
             padding: EdgeInsets.only(top: 75),
             child: Text(
-              "PAYMENT DETAILS",
+              "تفاصيل الدفع",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -115,7 +112,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
               textAlign: TextAlign.center,
             ),
           ),
-
           Column(
             children: [
               SizedBox(height: 200),
@@ -134,28 +130,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(height: 50),
-
-                      /// 🔹 Enter Amount
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: TextField(
                           controller: amountController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            hintText: "Enter Amount",
+                            hintText: "أدخل المبلغ",
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: color.darkcolor, width: 2),
                             ),
                           ),
                           onChanged: (value) {
@@ -166,115 +152,47 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       ),
                       SizedBox(height: 16),
-
-                      /// 🔹 Select Payment Method (After entering amount)
                       if (isAmountEntered)
-                        Expanded(
-                          child: ListView.builder(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: paymentMethods.length,
-                            itemBuilder: (context, index) {
-                              final method = paymentMethods[index];
-                              bool isSelected = selectedMethod == method;
-
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedMethod = method;
-                                  });
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: 10),
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: color.bgColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: isSelected ? Border.all(color: Colors.black, width: 2) : null,
-                                  ),
-                                  child: Center(
-                                    child: Text(method, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                                  ),
+                        Column(
+                          children: paymentMethods.map((method) {
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedMethod = method;
+                                });
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(bottom: 10),
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: color.bgColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: selectedMethod == method ? Border.all(color: Colors.black, width: 2) : null,
                                 ),
-                              );
-                            },
-                          ),
+                                child: Center(
+                                  child: Text(method, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
-
-                      /// 🔹 Display Payment Info
-                      if (selectedMethod == "CCP")
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Container(
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: color.bgColor,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Restaurant CCP Details:", style: TextStyle(fontWeight: FontWeight.bold)),
-                                SizedBox(height: 5),
-                                Text("Account Number: 123456789"),
-                                Text("Bank: XYZ Bank"),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                      if (selectedMethod == "Espèces")
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Text(
-                            "You will receive a verification call shortly.",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                          ),
-                        ),
-
-                      /// 🔹 Done Button
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: selectedMethod != null ? color.goldGradient : null,
-                            color: selectedMethod == null ? Colors.grey : null,
-                            borderRadius: BorderRadius.circular(10),
+                        child: ElevatedButton(
+                          onPressed: selectedMethod != null ? submitRequest : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
                           ),
-                          child: ElevatedButton(
-                            onPressed: selectedMethod != null
-                                ? () async {
-                              await submitRequest(); // Submit the request
-                              Navigator.pop(context); // Go back to the previous screen
-                            }
-                                : null,
-
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: Text(
-                              "Done",
-                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
+                          child: Text(
+                            "تم",
+                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          /// 🔹 Profile Image
-          Column(
-            children: [
-              SizedBox(height: 150),
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/img.png'),
               ),
             ],
           ),

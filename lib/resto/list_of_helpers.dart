@@ -65,12 +65,11 @@ class IftarDashboard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top App Bar Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Iftar",
+                    "إفطار",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -79,16 +78,13 @@ class IftarDashboard extends StatelessWidget {
                   ),
                   CircleAvatar(
                     radius: 22,
-                    backgroundImage: AssetImage('assets/img_1.png'), // Change to your image asset
+                    backgroundImage: AssetImage('assets/img_1.png'),
                   ),
                 ],
               ),
-
               SizedBox(height: 10),
-
-              // Comparison to last day
               Text(
-                "COMPARISON TO LAST DAY",
+                "مقارنة مع اليوم السابق",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               Row(
@@ -104,10 +100,7 @@ class IftarDashboard extends StatelessWidget {
                   ),
                 ],
               ),
-
               SizedBox(height: 10),
-
-              // Bar Chart
               Container(
                 height: 150,
                 child: BarChart(
@@ -125,10 +118,7 @@ class IftarDashboard extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: 10),
-
-              // Unaccomplished deliveries & Unsatisfied Needs
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(12),
@@ -139,31 +129,13 @@ class IftarDashboard extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      "Unaccomplished deliveries: 2",
+                      "التوصيلات غير المكتملة: 2",
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     Text(
-                      "Unsatisfied needs: 3",
+                      "الاحتياجات غير الملباة: 3",
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              // Stats Grid (Cards made bigger)
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1, // **Increased for bigger cards**
-                  children: [
-                    _buildStatCard("TOTAL COMPLETED TRANSPORTATIONS", "4", Colors.pink),
-                    _buildStatCard("TOTAL VOLUNTEERS", "20", Colors.orange),
-                    _buildStatCard("TOTAL CLIENTS", "50", Colors.green),
-                    _buildStatCard("TOTAL FOOD RECEIVED", "50 MEALS", Colors.purple),
                   ],
                 ),
               ),
@@ -173,98 +145,56 @@ class IftarDashboard extends StatelessWidget {
       ),
     );
   }
-  // Function to build a stat card (Made padding bigger)
-  Widget _buildStatCard(String title, String value, Color color) {
-    return Container(
-      padding: EdgeInsets.all(20), // **Increased padding for better spacing**
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8), // **Increased spacing**
-          Text(
-            value,
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class HelpersTableScreen extends StatelessWidget {
-  final List<String> columns = ["Name", "Phone", "Help Type", "Status"];
+  final List<String> columns = ["الاسم", "رقم الهاتف", "نوع المساعدة", "الحالة"];
   final List<Map<String, String>> data = [
-    {"Name": "Issam Menas", "Phone": "123456", "Help Type": "Food", "Status": "Available"},
-    {"Name": "John Doe", "Phone": "789012", "Help Type": "Transport", "Status": "Busy"},
+    {"الاسم": "عصام مناس", "رقم الهاتف": "123456", "نوع المساعدة": "طعام", "الحالة": "متاح"},
+    {"الاسم": "جون دو", "رقم الهاتف": "789012", "نوع المساعدة": "نقل", "الحالة": "مشغول"},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Helpers")),
+      appBar: AppBar(title: Text("المساعدون")),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal, // Allows horizontal scrolling
-          child: DataTable(
-            columns: columns.map((col) => DataColumn(label: Text(col))).toList(),
-            rows: data.map((row) {
-              return DataRow(cells: [
-                DataCell(Text(row["Name"]!)),
-                DataCell(Text(row["Phone"]!)),
-                DataCell(DropdownButton<String>(
-                  value: row["Help Type"],
-                  items: ["Food", "Transport", "Tools"].map((String item) {
-                    return DropdownMenuItem(value: item, child: Text(item));
-                  }).toList(),
-                  onChanged: (value) {},
-                )),
-                DataCell(DropdownButton<String>(
-                  value: row["Status"],
-                  items: ["Available", "Busy"].map((String item) {
-                    return DropdownMenuItem(value: item, child: Text(item));
-                  }).toList(),
-                  onChanged: (value) {},
-                )),
-              ]);
-            }).toList(),
-          ),
+        child: DataTable(
+          columns: columns.map((col) => DataColumn(label: Text(col))).toList(),
+          rows: data.map((row) {
+            return DataRow(cells: [
+              DataCell(Text(row["الاسم"]!)),
+              DataCell(Text(row["رقم الهاتف"]!)),
+              DataCell(Text(row["نوع المساعدة"]!)),
+              DataCell(Text(row["الحالة"]!)),
+            ]);
+          }).toList(),
         ),
       ),
     );
   }
 }
 
-
 class ClientsTableScreen extends StatelessWidget {
-  final List<String> columns = ["Name", "Phone"];
+  final List<String> columns = ["الاسم", "رقم الهاتف"];
   final List<Map<String, String>> clients = [
-    {"Name": "Alice Johnson", "Phone": "111222"},
-    {"Name": "Bob Smith", "Phone": "333444"},
+    {"الاسم": "أليس جونسون", "رقم الهاتف": "111222"},
+    {"الاسم": "بوب سميث", "رقم الهاتف": "333444"},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Clients")),
+      appBar: AppBar(title: Text("العملاء")),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: DataTable(
           columns: columns.map((col) => DataColumn(label: Text(col))).toList(),
           rows: clients.map((row) {
             return DataRow(cells: [
-              DataCell(Text(row["Name"]!)),
-              DataCell(Text(row["Phone"]!)),
+              DataCell(Text(row["الاسم"]!)),
+              DataCell(Text(row["رقم الهاتف"]!)),
             ]);
           }).toList(),
         ),

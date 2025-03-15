@@ -8,7 +8,7 @@ import '../classes/colors.dart';
 import 'foodpage.dart';
 
 class IftarHelpScreen extends StatefulWidget {
-  final String uid; // 🔹 Take UID as a parameter
+  final String uid; // 🔹 تمرير معرف المستخدم كمعامل
 
   IftarHelpScreen({required this.uid});
 
@@ -24,22 +24,22 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Help with Organizing?"),
-          content: Text("Do you want to confirm your help with organizing?"),
+          title: Text("المساعدة في التنظيم؟"),
+          content: Text("هل ترغب في تأكيد مساعدتك في التنظيم؟"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("No", style: TextStyle(color: color.darkcolor)),
+              child: Text("لا", style: TextStyle(color: color.darkcolor)),
             ),
             TextButton(
               onPressed: () {
                 setState(() {
                   isOrganizingConfirmed = true;
                 });
-                _updateVolunteerCount(1); // 🔹 Increase volunteers in Firestore
+                _updateVolunteerCount(1); // 🔹 زيادة عدد المتطوعين في Firestore
                 Navigator.pop(context);
               },
-              child: Text("Yes", style: TextStyle(color: color.darkcolor)),
+              child: Text("نعم", style: TextStyle(color: color.darkcolor)),
             ),
           ],
         ),
@@ -48,22 +48,22 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Cancel Organizing?"),
-          content: Text("Are you sure you want to cancel?"),
+          title: Text("إلغاء التنظيم؟"),
+          content: Text("هل أنت متأكد من الإلغاء؟"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("No", style: TextStyle(color: color.darkcolor)),
+              child: Text("لا", style: TextStyle(color: color.darkcolor)),
             ),
             TextButton(
               onPressed: () {
                 setState(() {
                   isOrganizingConfirmed = false;
                 });
-                _updateVolunteerCount(-1); // 🔹 Decrease volunteers in Firestore
+                _updateVolunteerCount(-1); // 🔹 تقليل عدد المتطوعين في Firestore
                 Navigator.pop(context);
               },
-              child: Text("Yes", style: TextStyle(color: color.darkcolor)),
+              child: Text("نعم", style: TextStyle(color: color.darkcolor)),
             ),
           ],
         ),
@@ -71,7 +71,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
     }
   }
 
-  /// 🔹 Function to update volunteers count in Firestore
+  /// 🔹 تحديث عدد المتطوعين في Firestore
   void _updateVolunteerCount(int increment) async {
     try {
       DocumentReference userRef =
@@ -86,9 +86,9 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
         }
       });
 
-      print("Volunteer count updated successfully!");
+      print("تم تحديث عدد المتطوعين بنجاح!");
     } catch (e) {
-      print("Error updating volunteers: $e");
+      print("خطأ في تحديث عدد المتطوعين: $e");
     }
   }
 
@@ -98,29 +98,20 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          /// 🔹 Full Gradient Background
+          /// 🔹 خلفية بتدرج لوني
           Container(
             decoration: BoxDecoration(
               gradient: color.goldGradient,
             ),
           ),
 
-          /// 🔹 Top Title
+          /// 🔹 العنوان العلوي
           Padding(
             padding: EdgeInsets.only(top: 75),
             child: Column(
               children: [
                 Text(
-                  "WHAT DO U WANNA HELP",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "WITH?",
+                  "بِمَ تُرِيدُ المُسَاعَدَة؟",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -151,7 +142,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
                     children: [
                       SizedBox(height: 50),
                       Text(
-                        'Ain taya  15 min',
+                        'عين طاية - 15 دقيقة',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -160,11 +151,11 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
                       ),
                       SizedBox(height: 30),
 
-                      /// 🔹 Help Buttons
-                      _helpButton('Food', Foodpage(uid: widget.uid)),
-                      _helpButton('Money', PaymentScreen(uid: widget.uid)),
-                      _helpButton('Transportation', null, isPopup: true),
-                      _helpButton('Utensils', UtensilLoanScreen(uid: widget.uid)),
+                      /// 🔹 أزرار المساعدة
+                      _helpButton('الطعام', Foodpage(uid: widget.uid)),
+                      _helpButton('المال', PaymentScreen(uid: widget.uid)),
+                      _helpButton('النقل', null, isPopup: true),
+                      _helpButton('الأواني', UtensilLoanScreen(uid: widget.uid)),
                       _organizingButton(),
                     ],
                   ),
@@ -186,7 +177,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
     );
   }
 
-  /// 🔹 Custom Help Button Widget
+  /// 🔹 زر المساعدة المخصص
   Widget _helpButton(String title, Widget? page, {bool isPopup = false}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6),
@@ -208,7 +199,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
               } else {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => page!), // 🔹 Pass UID to the page
+                  MaterialPageRoute(builder: (_) => page!), // 🔹 تمرير UID للصفحة
                 );
               }
             },
@@ -221,7 +212,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             ),
             child: Text(
-              'Donate',
+              'تبرع',
               style: TextStyle(
                 color: color.darkcolor,
                 fontWeight: FontWeight.bold,
@@ -234,7 +225,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
     );
   }
 
-  /// 🔹 Organizing Button
+  /// 🔹 زر التنظيم
   Widget _organizingButton() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6),
@@ -246,7 +237,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
         ),
         child: ListTile(
           title: Text(
-            'Organizing',
+            'التنظيم',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
           ),
           trailing: ElevatedButton(
@@ -260,7 +251,7 @@ class _IftarHelpScreenState extends State<IftarHelpScreen> {
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             ),
             child: Text(
-              isOrganizingConfirmed ? '✔' : 'Confirm',
+              isOrganizingConfirmed ? '✔' : 'تأكيد',
               style: TextStyle(
                 color: color.darkcolor,
                 fontWeight: FontWeight.bold,

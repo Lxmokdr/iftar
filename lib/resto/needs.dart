@@ -56,7 +56,7 @@ class _NeedsScreenState extends State<NeedsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Needs:", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text("الاحتياجات:", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               _buildArrowButton(Icons.arrow_forward, () {
                 setState(() {
                   currentPage = 1;
@@ -101,7 +101,7 @@ class _NeedsScreenState extends State<NeedsScreen> {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => AddNeed()));
                 },
                 icon: Icon(Icons.add, color: Colors.white),
-                label: Text("ADD", style: TextStyle(color: Colors.white)),
+                label: Text("إضافة", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
@@ -131,7 +131,7 @@ class _NeedsScreenState extends State<NeedsScreen> {
             child: Column(
               children: [
                 Text(
-                  "Needs of the restaurant",
+                  "احتياجات المطعم",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -171,20 +171,20 @@ class _NeedsScreenState extends State<NeedsScreen> {
                               });
                             }),
                             SizedBox(width: 10),
-                            Text("Set Needs", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                            Text("تحديد الاحتياجات", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ],
                     ),
                     SizedBox(height: 20),
-                    _buildInputField("Set max needed money", ".......DZD"),
+                    _buildInputField("تحديد الحد الأقصى للأموال المطلوبة", ".......دينار جزائري"),
                     SizedBox(height: 10),
-                    _buildInputField("Set max needed Organizers", "......."),
+                    _buildInputField("تحديد الحد الأقصى لمنظمي الحفل", "......."),
                     SizedBox(height: 30),
                     Center(
                       child: ElevatedButton(
                         onPressed: () {},
-                        child: Text("Block Food", style: TextStyle(color: Colors.white)),
+                        child: Text("إيقاف الطعام", style: TextStyle(color: Colors.white)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -232,5 +232,4 @@ class _NeedsScreenState extends State<NeedsScreen> {
       ],
     );
   }
-
 }

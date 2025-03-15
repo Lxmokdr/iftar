@@ -9,7 +9,7 @@ import 'help.dart';
 import 'package:uuid/uuid.dart';
 
 class UtensilLoanScreen extends StatefulWidget {
-  final String uid; // 🔹 Take UID as a parameter
+  final String uid;
 
   UtensilLoanScreen({required this.uid});
   @override
@@ -19,8 +19,7 @@ class UtensilLoanScreen extends StatefulWidget {
 class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
   String? selectedUtensil;
   TextEditingController quantityController = TextEditingController();
-  String? volunteerUid; // Current User UID
-
+  String? volunteerUid;
 
   @override
   void initState() {
@@ -36,19 +35,19 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
   }
 
   final List<String> utensils = [
-    "Plate",
-    "Cups",
-    "Spoons",
-    "Forks",
-    "Knives",
-    "Pots",
-    "Serving Trays",
+    "طبق",
+    "أكواب",
+    "ملاعق",
+    "شوَك",
+    "سكاكين",
+    "قدور",
+    "صواني تقديم",
   ];
 
   Future<void> submitRequest() async {
     if (selectedUtensil == null || selectedUtensil!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select a utensil.")),
+        SnackBar(content: Text("يرجى اختيار أداة.")),
       );
       return;
     }
@@ -56,52 +55,48 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
     int quantity = int.tryParse(quantityController.text) ?? 0;
     if (quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter a valid quantity.")),
+        SnackBar(content: Text("يرجى إدخال كمية صالحة.")),
       );
       return;
     }
 
     if (volunteerUid == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not authenticated!")),
+        const SnackBar(content: Text("المستخدم غير مصادق عليه!")),
       );
       return;
     }
 
-    String restoUid = widget.uid; // 🔹 Resto UID passed from screen
-    String requestId = Uuid().v4(); // 🔹 Generate a unique ID for the request
+    String restoUid = widget.uid;
+    String requestId = Uuid().v4();
 
     try {
-      // Reference to the requests collection inside the restaurant UID
       DocumentReference requestRef = FirebaseFirestore.instance
           .collection("requests")
           .doc(restoUid)
           .collection("requests")
           .doc(requestId);
 
-      // Create a new request document
       await requestRef.set({
         'volunteer_uid': volunteerUid,
         'type': 'utensil',
         'item': selectedUtensil,
         'quantity': quantity,
-        'timestamp': FieldValue.serverTimestamp(), // 🔹 Add timestamp
+        'timestamp': FieldValue.serverTimestamp(),
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Request submitted successfully!")),
+        SnackBar(content: Text("تم إرسال الطلب بنجاح!")),
       );
 
-      // Clear input fields after submission
       quantityController.clear();
       setState(() {
         selectedUtensil = null;
       });
-
     } catch (e) {
-      print("Error submitting request: $e");
+      print("خطأ في إرسال الطلب: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to submit request!")),
+        SnackBar(content: Text("فشل في إرسال الطلب!")),
       );
     }
   }
@@ -112,29 +107,17 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          /// 🔹 Full Gradient Background
           Container(
             decoration: BoxDecoration(
               gradient: color.goldGradient,
             ),
           ),
-
-          /// 🔹 Top Title
           Padding(
             padding: EdgeInsets.only(top: 75),
             child: Column(
               children: [
                 Text(
-                  "WHAT DO U WANNA HELP",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "WITH?",
+                  "بماذا تريد المساعدة؟",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -145,8 +128,6 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
               ],
             ),
           ),
-
-          /// 🔹 Main Content
           Column(
             children: [
               SizedBox(height: 200),
@@ -165,13 +146,11 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(height: 50),
-
-                      /// 🔹 UTENSIL DROPDOWN FIELD
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: DropdownButtonFormField<String>(
                           value: selectedUtensil,
-                          hint: Text("Select Utensil"),
+                          hint: Text("اختر أداة"),
                           items: utensils.map((String utensil) {
                             return DropdownMenuItem<String>(
                               value: utensil,
@@ -193,65 +172,52 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
                           ),
                         ),
                       ),
-
-                      /// 🔹 OTHER INPUT FIELDS
-                      buildInputField("Quantity..", quantityController),
-
+                      buildInputField("الكمية..", quantityController),
                       SizedBox(height: 20),
-
-                      /// 🔹 ACTION BUTTONS
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          buildActionButton("Done", () async {
-                            await submitRequest(); // ✅ Call function before navigating
+                          buildActionButton("تم", () async {
+                            await submitRequest();
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (_) => IftarHelpScreen(uid: widget.uid)),
                             );
                           }),
-
                           SizedBox(width: 16),
-                          buildActionButton("See List", () async {
+                          buildActionButton("عرض القائمة", () async {
                             if (widget.uid.isEmpty) {
-                              print("Error: UID is empty!");
+                              print("خطأ: معرف المستخدم فارغ!");
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Error: UID is empty!")),
+                                SnackBar(content: Text("خطأ: معرف المستخدم فارغ!")),
                               );
                               return;
                             }
 
-                            print("Fetching utensils for UID: ${widget.uid}");
+                            print("جلب الأدوات لمعرفة المستخدم: ${widget.uid}");
 
                             try {
-                              List<Map<String, dynamic>> utensils = await getUtensils(widget.uid); // 🔹 Ensure correct type
-
+                              List<Map<String, dynamic>> utensils = await getUtensils(widget.uid);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => Utensilist(utensils: utensils, uid: widget.uid), // ✅ No type mismatch
+                                  builder: (_) => Utensilist(utensils: utensils, uid: widget.uid),
                                 ),
                               );
                             } catch (e) {
-                              print("Error fetching utensils: $e");
+                              print("خطأ في جلب الأدوات: $e");
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Failed to load utensils!")),
+                                SnackBar(content: Text("فشل تحميل الأدوات!")),
                               );
                             }
                           }),
-
-
-
                         ],
                       ),
-
                       Spacer(),
-
-                      /// 🔹 FOOTER TEXT
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text('If you need transportation call the center'),
+                          Text('إذا كنت بحاجة إلى نقل، اتصل بالمركز'),
                           Text('0557334515'),
                         ],
                       ),
@@ -261,8 +227,6 @@ class _UtensilLoanScreenState extends State<UtensilLoanScreen> {
               ),
             ],
           ),
-
-          /// 🔹 PROFILE IMAGE
           Column(
             children: [
               SizedBox(height: 150),

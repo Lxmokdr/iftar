@@ -12,7 +12,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create a Post'),
+        title: Text('إنشاء منشور'),
         backgroundColor: Color.fromARGB(255, 203, 140, 52),
       ),
       body: Padding(
@@ -24,17 +24,17 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               controller: _captionController,
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: 'Write something...',
+                hintText: 'اكتب شيئًا...',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
-                // Implement image later
+                // تنفيذ إضافة الصورة لاحقًا
               },
               icon: Icon(Icons.image),
-              label: Text('Add Image'),
+              label: Text('إضافة صورة'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color.fromARGB(255, 203, 140, 52),
                 foregroundColor: Colors.white,
@@ -44,10 +44,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Implement post logic
+                  // تنفيذ منطق النشر
                   Navigator.pop(context);
                 },
-                child: Text('Post'),
+                child: Text('نشر'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromARGB(255, 203, 140, 52),
                   foregroundColor: Colors.white,

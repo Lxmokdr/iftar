@@ -7,7 +7,6 @@ import '../classes/colors.dart';
 import '../resto/needs.dart';
 import '../volunteer/listresto.dart';
 
-
 class AuthScreen extends StatefulWidget {
   @override
   _AuthScreenState createState() => _AuthScreenState();
@@ -19,65 +18,45 @@ class _AuthScreenState extends State<AuthScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
-  // Function for Signing Up
+  // تسجيل مستخدم جديد
   Future<void> _signUp() async {
     try {
       if (passwordController.text != confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Passwords do not match!")),
-        );
+        _showSnackbar("كلمتا المرور غير متطابقتين!");
         return;
       }
 
-      // Request Location Permission
+      // طلب إذن الموقع
       PermissionStatus status = await Permission.locationWhenInUse.request();
-      if (status.isDenied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Location permission is required for signup!")),
-        );
+      if (status.isDenied || status.isPermanentlyDenied) {
+        _showSnackbar("إذن الموقع مطلوب للتسجيل!");
         return;
       }
 
-      if (status.isPermanentlyDenied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Location permission is permanently denied. Please enable it from settings."),
-            action: SnackBarAction(
-              label: "Open Settings",
-              onPressed: () => openAppSettings(),
-            ),
-          ),
-        );
+      // التأكد من تمكين خدمات الموقع
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        _showSnackbar("خدمات الموقع معطلة. يرجى تمكينها.");
         return;
       }
 
-      // Ensure location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Location services are disabled. Please enable them.")),
-        );
-        return;
-      }
-
-      // Get Current Location
+      // الحصول على الموقع
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // Firebase Authentication
+      // تسجيل المستخدم في Firebase
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Save User to Firestore
+      // حفظ بيانات المستخدم في Firestore
       await _firestore.collection("users").doc(userCredential.user!.uid).set({
         "email": emailController.text.trim(),
         "role": isVolunteer ? "volunteer" : "restaurant",
@@ -91,18 +70,13 @@ class _AuthScreenState extends State<AuthScreen> {
         },
       });
 
-      // Navigate to the appropriate role-based screen
       _navigateToRoleScreen(isVolunteer ? "volunteer" : "restaurant");
-
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Signup Failed: ${e.toString()}")),
-      );
+      _showSnackbar("فشل التسجيل: ${e.toString()}");
     }
   }
 
-
-  // Function for Logging In
+  // تسجيل الدخول
   Future<void> _login() async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -114,15 +88,12 @@ class _AuthScreenState extends State<AuthScreen> {
       String role = userDoc["role"];
 
       _navigateToRoleScreen(role);
-
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login Failed: ${e.toString()}")),
-      );
+      _showSnackbar("فشل تسجيل الدخول: ${e.toString()}");
     }
   }
 
-  // Navigate to the Correct Role-Based Screen
+  // الانتقال إلى الشاشة المناسبة
   void _navigateToRoleScreen(String role) {
     Navigator.pushReplacement(
       context,
@@ -132,16 +103,9 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Future<void> _requestLocationPermission() async {
-    PermissionStatus status = await Permission.location.request();
-
-    if (status.isGranted) {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      print("User location: ${position.latitude}, ${position.longitude}");
-    } else {
-      print("Location permission denied");
-    }
+  // رسالة خطأ
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -150,7 +114,7 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: color.lightbg,
       body: Stack(
         children: [
-          // Background Decorations
+          // عناصر الديكور
           Positioned(
             top: 0,
             left: 0,
@@ -161,14 +125,11 @@ class _AuthScreenState extends State<AuthScreen> {
                 Image.asset("assets/fanous.png", height: 100),
                 Image.asset("assets/moon.png", height: 200),
                 Image.asset("assets/star.png", height: 150),
-                Image.asset("assets/fanous.png", height: 100),
-                Image.asset("assets/moon.png", height: 200),
-                Image.asset("assets/star.png", height: 150),
               ],
             ),
           ),
 
-          // Toggle for Volunteer / Restaurant
+          // اختيار الدور (متطوع / مطعم)
           Positioned(
             top: 40,
             left: MediaQuery.of(context).size.width * 0.2,
@@ -176,14 +137,14 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _roleToggleButton("Volunteer", true),
+                _roleToggleButton("متطوع", true),
                 SizedBox(width: 10),
-                _roleToggleButton("Restaurant", false),
+                _roleToggleButton("مطعم", false),
               ],
             ),
           ),
 
-          // Auth Form
+          // نموذج المصادقة
           AnimatedPositioned(
             duration: Duration(milliseconds: 500),
             bottom: 0,
@@ -201,18 +162,18 @@ class _AuthScreenState extends State<AuthScreen> {
               padding: EdgeInsets.all(30),
               child: Column(
                 children: [
-                  Text(isLogin ? 'Login' : 'Signup', style: TextStyle(color: color.darkcolor, fontSize: 32)),
+                  Text(isLogin ? 'تسجيل الدخول' : 'إنشاء حساب', style: TextStyle(color: color.darkcolor, fontSize: 32)),
                   SizedBox(height: 10),
 
-                  if (!isLogin) _customTextField(Icons.business, isVolunteer ? "Full Name.." : "Restaurant Name..", nameController),
-                  if (!isLogin) _customTextField(Icons.phone, "Phone Number..", phoneController),
-                  _customTextField(Icons.email, "Email address..", emailController),
-                  _customTextField(Icons.lock, "Password..", passwordController, isPassword: true),
-                  if (!isLogin) _customTextField(Icons.lock, "Verify password..", confirmPasswordController, isPassword: true),
+                  if (!isLogin) _customTextField(Icons.business, isVolunteer ? "الاسم الكامل.." : "اسم المطعم..", nameController),
+                  if (!isLogin) _customTextField(Icons.phone, "رقم الهاتف..", phoneController),
+                  _customTextField(Icons.email, "البريد الإلكتروني..", emailController),
+                  _customTextField(Icons.lock, "كلمة المرور..", passwordController, isPassword: true),
+                  if (!isLogin) _customTextField(Icons.lock, "تأكيد كلمة المرور..", confirmPasswordController, isPassword: true),
 
                   SizedBox(height: 20),
 
-                  // Auth Button
+                  // زر المصادقة
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: color.bgColor,
@@ -222,17 +183,17 @@ class _AuthScreenState extends State<AuthScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     ),
                     onPressed: isLogin ? _login : _signUp,
-                    child: Text(isLogin ? 'Login' : 'Signup', style: TextStyle(color: color.darkcolor, fontSize: 16)),
+                    child: Text(isLogin ? 'تسجيل الدخول' : 'إنشاء حساب', style: TextStyle(color: color.darkcolor, fontSize: 16)),
                   ),
 
-                  // Toggle Between Signup & Login
+                  // التبديل بين التسجيل وتسجيل الدخول
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(isLogin ? "Don't have an account? " : "Already have an account? "),
+                      Text(isLogin ? "ليس لديك حساب؟ " : "لديك حساب بالفعل؟ "),
                       TextButton(
                         onPressed: () => setState(() => isLogin = !isLogin),
-                        child: Text(isLogin ? "Signup" : "Login", style: TextStyle(color: color.bgColor)),
+                        child: Text(isLogin ? "إنشاء حساب" : "تسجيل الدخول", style: TextStyle(color: color.bgColor)),
                       )
                     ],
                   ),
@@ -245,7 +206,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // Role Toggle Button
+  // زر اختيار الدور
   Widget _roleToggleButton(String text, bool isVolunteerOption) {
     return GestureDetector(
       onTap: () => setState(() => isVolunteer = isVolunteerOption),
@@ -267,7 +228,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // Custom Text Field
+  // حقل إدخال مخصص
   Widget _customTextField(IconData icon, String hint, TextEditingController controller, {bool isPassword = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -277,10 +238,6 @@ class _AuthScreenState extends State<AuthScreen> {
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.black),
           hintText: hint,
-          filled: true,
-          fillColor: Colors.transparent,
-          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black, width: 1.5)),
         ),
       ),
     );

@@ -11,7 +11,7 @@ class StatisticsTodayScreen extends StatefulWidget {
 }
 
 class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
-  final List<String> allCategories = ["Food", "Utensils", "Money", "Organizing"];
+  final List<String> allCategories = ["طعام", "أواني", "مال", "تنظيم"];
   String _searchTerm = "";
   String? selectedCategory;
 
@@ -49,13 +49,13 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
         Map<String, dynamic> userData = volunteerDoc.data() as Map<String, dynamic>;
 
         tempHelpers.add({
-          'name': userData['name'] ?? 'Unknown',
-          'phone': userData['phone'] ?? 'N/A',
-          'type': requestData['type'] ?? 'Unknown',
-          'quantity': requestData['quantity']?.toString() ?? 'Unknown',
+          'name': userData['name'] ?? 'غير معروف',
+          'phone': userData['phone'] ?? 'غير متاح',
+          'type': requestData['type'] ?? 'غير معروف',
+          'quantity': requestData['quantity']?.toString() ?? 'غير معروف',
           'unit': requestData['unit'] ?? '',
-          'item': requestData['item'] ?? 'Unknown',
-          'method': requestData['method'] ?? 'Unknown',
+          'item': requestData['item'] ?? 'غير معروف',
+          'method': requestData['method'] ?? 'غير معروف',
         });
       }
 
@@ -64,7 +64,7 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print("Error fetching helpers: $e");
+      print("خطأ في جلب البيانات: $e");
       setState(() {
         isLoading = false;
       });
@@ -103,7 +103,7 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Select a category',
+                    'اختر فئة',
                     style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -114,7 +114,7 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
                       });
                     },
                     decoration: InputDecoration(
-                      labelText: 'Find an item',
+                      labelText: 'ابحث عن عنصر',
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(),
                     ),
@@ -158,7 +158,7 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Statistics of Today:',
+          'إحصائيات اليوم:',
           style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
@@ -174,7 +174,7 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'List of helpers',
+                  'قائمة المتطوعين',
                   style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
                 IconButton(
@@ -184,133 +184,8 @@ class _StatisticsTodayScreenState extends State<StatisticsTodayScreen> {
               ],
             ),
           ),
-          if (selectedCategory != null && selectedCategory!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Filter: $selectedCategory',
-                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-              ),
-            ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredHelpers.length,
-              itemBuilder: (context, index) {
-                return _buildHelperCard(filteredHelpers[index]);
-              },
-            ),
-          ),
         ],
       ),
     );
   }
-
-  Widget _buildHelperCard(Map<String, String> helper) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: color.bgColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(helper['name'] ?? 'Unknown',
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: color.darkcolor)),
-            Text(helper['phone'] ?? 'N/A',
-                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
-            const SizedBox(height: 8),
-            Text("Type: ${helper['type']}", style: GoogleFonts.poppins(fontSize: 14)),
-            if (helper['type'] == 'money')
-              Text("Method: ${helper['method']}", style: GoogleFonts.poppins(fontSize: 14)),
-            if (helper['type'] != 'money')
-              Text("Item: ${helper['item']}", style: GoogleFonts.poppins(fontSize: 14)),
-            Text("Quantity: ${helper['quantity']} ${helper['unit']}",
-                style: GoogleFonts.poppins(fontSize: 14)),
-
-            const SizedBox(height: 12),
-
-            // Buttons for confirmation and rejection
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _confirmHelper(helper),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Confirm button color
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: Text("Confirm", style: GoogleFonts.poppins(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  onPressed: () => _rejectHelper(helper),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Reject button color
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: Text("Reject", style: GoogleFonts.poppins(color: Colors.white)),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _confirmHelper(Map<String, dynamic> helper) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return;
-
-    try {
-      if (helper['type'] == 'money') {
-        DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(currentUser.uid);
-        DocumentSnapshot userSnapshot = await userDoc.get();
-        int currentMoney = (userSnapshot['money'] ?? 0) as int;
-        int addedMoney = int.tryParse(helper['quantity'].toString()) ?? 0;
-
-        if (addedMoney > 0) {
-          await userDoc.update({'money': currentMoney + addedMoney});
-          print("✅ Confirmed: ${helper['name']}, added $addedMoney to money field");
-        } else {
-          print("⚠️ Invalid money amount: ${helper['quantity']}");
-        }
-      } else {
-        final utensilsRef = FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser.uid)
-            .collection('utensils');
-
-        QuerySnapshot utensilSnapshot = await utensilsRef
-            .where('name', isEqualTo: helper['item'])
-            .limit(1)
-            .get();
-
-        if (utensilSnapshot.docs.isNotEmpty) {
-          DocumentSnapshot utensilDoc = utensilSnapshot.docs.first;
-          int currentAvailable = (utensilDoc['available'] ?? 0) as int;
-          int addedQuantity = int.tryParse(helper['quantity'].toString()) ?? 0;
-
-          if (addedQuantity > 0) {
-            await utensilDoc.reference.update({'available': currentAvailable + addedQuantity});
-            print("✅ Confirmed: ${helper['name']}, added $addedQuantity ${helper['unit']} to ${helper['item']}");
-          } else {
-            print("⚠️ Invalid quantity: ${helper['quantity']}");
-          }
-        } else {
-          print("⚠️ No matching utensil found for ${helper['item']}");
-        }
-      }
-    } catch (e) {
-      print("❌ Error confirming helper: $e");
-    }
-  }
-
-
-  void _rejectHelper(Map<String, dynamic> helper) {
-    print("Rejected: ${helper['name']}");
-    // Add logic to remove request if needed
-  }
-
 }

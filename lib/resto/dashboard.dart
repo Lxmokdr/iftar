@@ -73,7 +73,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (e) {
-      print("❌ Error fetching statistics: $e");
+      print("❌ خطأ أثناء جلب الإحصائيات: $e");
       setState(() {
         isLoading = false;
       });
@@ -108,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "Summary",
+          "الملخص",
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
@@ -130,9 +130,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       spacing: 15,
       runSpacing: 15,
       children: [
-        _buildStatCard("TOTAL VOLUNTEERS", "$totalVolunteers", color.bgColor),
-        _buildStatCard("MONEY RECEIVED", "$moneyReceived DZD", color.bgColor),
-        _buildStatCard("TOTAL ORGANIZERS", "$totalOrganizers", color.bgColor),
+        _buildStatCard("إجمالي المتطوعين", "$totalVolunteers", color.bgColor),
+        _buildStatCard("المبلغ المستلم", "$moneyReceived د.ج", color.bgColor),
+        _buildStatCard("إجمالي المنظمين", "$totalOrganizers", color.bgColor),
       ],
     );
   }
@@ -222,8 +222,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       spacing: 15,
       runSpacing: 15,
       children: [
-        _buildStatCardFoodUte("FOOD", "$totalFood", "TOTAL MEALS", color.bgColor),
-        _buildStatCardFoodUte("UTENSILS", "$totalUtensils", "", color.bgColor),
+        _buildStatCardFoodUte("الطعام", "$totalFood", "إجمالي الوجبات", color.bgColor),
+        _buildStatCardFoodUte("الأواني", "$totalUtensils", "", color.bgColor),
       ],
     );
   }

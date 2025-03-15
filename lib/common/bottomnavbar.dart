@@ -32,7 +32,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
     _controller = PersistentTabController(initialIndex: 0);
   }
 
-  /// 📌 Defines screens based on role
+  /// 📌 تحديد الشاشات بناءً على الدور
   List<Widget> _buildScreens() {
     if (widget.role == "volunteer") {
       return [IftarScreen(), ShowScreen(), ProfileScreen()];
@@ -41,25 +41,25 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
     }
   }
 
-  /// 📌 Defines navbar items with custom colors
+  /// 📌 تحديد عناصر شريط التنقل بألوان مخصصة
   List<PersistentBottomNavBarItem> _navBarItems() {
     if (widget.role == "volunteer") {
       return [
         PersistentBottomNavBarItem(
           icon: Icon(Icons.home, color: color.darkcolor),
-          title: "Home",
+          title: "الرئيسية",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
           icon: Icon(Icons.inbox, color: color.darkcolor),
-          title: "Inbox",
+          title: "البريد الوارد",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
           icon: Icon(Icons.person, color: color.darkcolor),
-          title: "Profile",
+          title: "الملف الشخصي",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
@@ -68,25 +68,25 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
       return [
         PersistentBottomNavBarItem(
           icon: Icon(Icons.home, color: color.darkcolor),
-          title: "Home",
+          title: "الرئيسية",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
           icon: Icon(Icons.dashboard, color: color.darkcolor),
-          title: "Dashboard",
+          title: "لوحة التحكم",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
           icon: Icon(Icons.inbox, color: color.darkcolor),
-          title: "Inbox",
+          title: "البريد الوارد",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
         PersistentBottomNavBarItem(
           icon: Icon(Icons.person, color: color.darkcolor),
-          title: "Profile",
+          title: "الملف الشخصي",
           activeColorPrimary: color.bgColor,
           inactiveColorPrimary: color.darkcolor,
         ),
@@ -97,12 +97,12 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 0), // Space at bottom
+      padding: const EdgeInsets.only(bottom: 0), // مساحة في الأسفل
       child: ClipRRect(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.9, // Slightly wider navbar
+          width: MediaQuery.of(context).size.width * 0.9, // شريط تنقل أعرض قليلاً
           decoration: BoxDecoration(
-            color: Colors.white
+              color: Colors.white
           ),
           child: PersistentTabView(
             context,
@@ -110,12 +110,12 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
             screens: _buildScreens(),
             items: _navBarItems(),
             confineToSafeArea: true,
-            backgroundColor: Colors.transparent, // Transparent so the gradient shows
+            backgroundColor: Colors.transparent, // شفاف حتى يظهر التدرج
             decoration: NavBarDecoration(
-              borderRadius: BorderRadius.circular(50), // Match container radius
+              borderRadius: BorderRadius.circular(50), // تطابق نصف القطر مع الحاوية
               colorBehindNavBar: Colors.transparent,
             ),
-            navBarStyle: NavBarStyle.style3, // Custom navbar style
+            navBarStyle: NavBarStyle.style3, // نمط شريط التنقل المخصص
           ),
         ),
       ),

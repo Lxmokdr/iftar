@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:iftar/classes/colors.dart';
 import 'package:iftar/common/signup.dart';
 
@@ -9,10 +11,41 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String notificationSetting = "Allow";
-  String selectedLanguage = "English";
+  String notificationSetting = "السماح";
+  String selectedLanguage = "العربية";
+  final List<String> languages = ["الإنجليزية", "الفرنسية", "العربية", "الإسبانية"];
 
-  final List<String> languages = ["English", "French", "Arabic", "Spanish"];
+  String name = "";
+  String email = "";
+  String phone = "";
+  String location = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        print("Fetched User Data: ${userDoc.data()}"); // Debugging
+        setState(() {
+          name = userDoc["name"] ?? "اسم غير متوفر";
+          email = userDoc["email"] ?? "بريد غير متوفر";
+          phone = userDoc["phone"] ?? "رقم غير متوفر";
+          location = userDoc["location"] ?? "موقع غير متوفر";
+        });
+      } else {
+        print("User document does not exist in Firestore.");
+      }
+    } else {
+      print("No user is logged in.");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +56,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: color.darkcolor),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Iftar',
-          style: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: color.darkcolor,
-          ),
+          'إفطار',
+          style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: color.darkcolor),
         ),
         centerTitle: true,
       ),
@@ -43,33 +70,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/img_1.png'),
-            ),
+            CircleAvatar(radius: 50, backgroundImage: AssetImage('assets/img_1.png')),
             SizedBox(height: 10),
-            Text(
-              'Your Name',
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'yourname@gmail.com',
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-            ),
+            Text(name, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+            Text(email, style: GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
             SizedBox(height: 20),
             Divider(thickness: 1, color: Colors.grey.shade300),
-            _buildProfileOption(Icons.person_outline, 'My Profile', () {
-              _showProfilePopup(context);
-            }),
-            _buildProfileOption(Icons.settings, 'Settings', () {
-              _showSettingsBottomSheet(context);
-            }),
+            _buildProfileOption(Icons.person_outline, 'ملفي الشخصي', () => _showProfilePopup(context)),
+            _buildProfileOption(Icons.settings, 'الإعدادات', () => _showSettingsBottomSheet(context)),
             _buildNotificationOption(),
-            _buildProfileOption(Icons.logout, 'Log Out', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AuthScreen()),
-              );
+            _buildProfileOption(Icons.logout, 'تسجيل الخروج', () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthScreen()));
             }),
           ],
         ),
@@ -86,12 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Icon(icon, color: Colors.black),
             SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-            ),
+            Expanded(child: Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500))),
             Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
           ],
         ),
@@ -106,12 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Icon(Icons.notifications_outlined, color: Colors.black),
           SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Notification',
-              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ),
+          Expanded(child: Text('الإشعارات', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500))),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
@@ -124,20 +126,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 dropdownColor: color.darkcolor,
                 value: notificationSetting,
                 style: TextStyle(color: Colors.white),
-                items: ['Allow', 'Mute'].map((String value) {
+                items: ['السماح', 'كتم الصوت'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: Text(value, style: TextStyle(color: Colors.white)),
                   );
                 }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    notificationSetting = newValue!;
-                  });
-                },
+                onChanged: (newValue) => setState(() => notificationSetting = newValue!),
               ),
             ),
           ),
@@ -145,6 +140,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  void _showProfilePopup(BuildContext context) {
+    TextEditingController nameController = TextEditingController(text: name);
+    TextEditingController phoneController = TextEditingController(text: phone);
+    TextEditingController locationController = TextEditingController(text: location);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: color.lightbg, // Set background to app theme
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Text(
+            'تحديث الملف الشخصي',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: color.darkcolor, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildProfileTextField('الاسم الكامل', nameController),
+              _buildProfileTextField('رقم الهاتف', phoneController),
+              _buildProfileTextField('الموقع', locationController),
+              SizedBox(height: 10),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color.darkcolor, // App primary color
+                  foregroundColor: color.lightbg, // Text color
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () async {
+                  User? user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+                      "name": nameController.text,
+                      "phone": phoneController.text,
+                      "location": locationController.text,
+                    });
+                    _fetchUserData();
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text('حفظ التغييرات'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: color.darkcolor),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: color.darkcolor),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: color.darkcolor, width: 2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+
 
   void _showSettingsBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -164,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Settings', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('الإعدادات', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
                     icon: Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -172,43 +239,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               Divider(thickness: 1, color: Colors.grey.shade300),
-              SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Language', style: GoogleFonts.poppins(fontSize: 16)),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: color.darkcolor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        borderRadius: BorderRadius.circular(20),
-                        dropdownColor: color.darkcolor,
-                        value: selectedLanguage,
-                        style: TextStyle(color: Colors.white),
-                        items: languages.map((String lang) {
-                          return DropdownMenuItem<String>(
-                            value: lang,
-                            child: Text(
-                              lang,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            selectedLanguage = newValue!;
-                          });
-                        },
-                      ),
-                    ),
+                  Text('اللغة', style: GoogleFonts.poppins(fontSize: 16)),
+                  DropdownButton<String>(
+                    value: selectedLanguage,
+                    items: languages.map((String lang) {
+                      return DropdownMenuItem<String>(value: lang, child: Text(lang));
+                    }).toList(),
+                    onChanged: (newValue) => setState(() => selectedLanguage = newValue!),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
             ],
           ),
         );
@@ -216,103 +259,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showProfilePopup(BuildContext context) {
-    TextEditingController nameController = TextEditingController(text: 'Your Name');
-    TextEditingController emailController = TextEditingController(text: 'yourname@gmail.com');
-    TextEditingController phoneController = TextEditingController(text: 'Add number');
-    TextEditingController locationController = TextEditingController(text: 'USA');
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          content: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage('assets/img_1.png'),
-                ),
-                SizedBox(height: 10),
-
-                // Name Field
-                _buildProfileTextField('Full Name', nameController),
-
-                // Email Field
-                _buildProfileTextField('Email', emailController),
-
-                // Phone Number Field
-                _buildProfileTextField('Phone Number', phoneController),
-
-                // Location Field
-                _buildProfileTextField('Location', locationController),
-
-                SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // Save changes logic here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: color.darkcolor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Save Changes',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-// Custom Widget for Profile Text Fields
-  Widget _buildProfileTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-    );
-  }
-
-
-  Widget _buildProfileDetail(String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(value, style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
-        ],
-      ),
-    );
-  }
 }

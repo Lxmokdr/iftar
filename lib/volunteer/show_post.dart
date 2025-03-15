@@ -11,9 +11,9 @@ class _HomeScreenState extends State<ShowScreen> {
   bool isSaved = false;
   int likes = 10;
   int comments = 6;
-  String location = "Aïn Taya";
-  String restaurantName = "EL RAHMA";
-  String timeAgo = "6 minutes ago";
+  String location = "عين طاية";
+  String restaurantName = "الرحمة";
+  String timeAgo = "منذ 6 دقائق";
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class _HomeScreenState extends State<ShowScreen> {
           children: [
             SizedBox(width: 10),
             Text(
-              'Iftar',
+              'إفطار',
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _HomeScreenState extends State<ShowScreen> {
                       SizedBox(width: 20),
                       Icon(Icons.chat_bubble_outline, color: Color.fromARGB(255, 203, 140, 52)),
                       SizedBox(width: 5),
-                      Text('$comments COMMENTS', style: TextStyle(color: Colors.grey)),
+                      Text('$comments تعليق', style: TextStyle(color: Colors.grey)),
                       Spacer(),
                       IconButton(
                         icon: Icon(
@@ -121,7 +121,6 @@ class _HomeScreenState extends State<ShowScreen> {
           ],
         ),
       ),
-
     );
   }
 }

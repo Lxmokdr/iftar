@@ -5,7 +5,7 @@ import 'package:iftar/volunteer/utensils.dart';
 import 'help.dart';
 
 class Utensilist extends StatefulWidget {
-  final String uid; // 🔹 Take UID as a parameter
+  final String uid; // 🔹 معرف المستخدم كمعامل
   final List<Map<String, dynamic>> utensils;
   Utensilist({super.key, required this.utensils, required this.uid});
 
@@ -19,18 +19,18 @@ class _UtensilistState extends State<Utensilist> {
   @override
   void initState() {
     super.initState();
-    utensils = widget.utensils;  // ✅ Assign the passed utensils list
+    utensils = widget.utensils;  // ✅ تعيين قائمة الأدوات المستلمة
   }
 
-  /// 🔹 Function to determine background color based on availability
+  /// 🔹 وظيفة لتحديد لون الخلفية بناءً على التوفر
   Color getBackgroundColor(int needed, int available) {
     double ratio = available / needed;
     if (ratio >= 1) {
-      return Colors.green.shade400; // Fully available
+      return Colors.green.shade400; // متوفر بالكامل
     } else if (ratio >= 0.5) {
-      return Colors.yellow.shade400; // Moderately available
+      return Colors.yellow.shade400; // متوفر جزئياً
     } else {
-      return Colors.red.shade400; // Critically low
+      return Colors.red.shade400; // منخفض للغاية
     }
   }
 
@@ -48,7 +48,7 @@ class _UtensilistState extends State<Utensilist> {
       ),
       body: Column(
         children: [
-          /// 🔹 IMAGE HEADER
+          /// 🔹 صورة العنوان
           Container(
             decoration: BoxDecoration(
               color: color.bgColor,
@@ -61,7 +61,7 @@ class _UtensilistState extends State<Utensilist> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.asset(
-                'assets/img.png', // Replace with actual image
+                'assets/img.png', // استبدلها بالصورة الفعلية
                 width: double.infinity,
                 height: 150,
                 fit: BoxFit.cover,
@@ -70,7 +70,7 @@ class _UtensilistState extends State<Utensilist> {
           ),
           SizedBox(height: 16),
 
-          /// 🔹 GRID LIST DISPLAY
+          /// 🔹 عرض القائمة الشبكية
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -78,9 +78,9 @@ class _UtensilistState extends State<Utensilist> {
                 itemCount: utensils.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 12, // Increased spacing
-                  mainAxisSpacing: 12, // Increased spacing
-                  childAspectRatio: 1.5, // ✅ Make boxes taller
+                  crossAxisSpacing: 12, // زيادة التباعد
+                  mainAxisSpacing: 12, // زيادة التباعد
+                  childAspectRatio: 1.5, // ✅ جعل الصناديق أطول
                 ),
                 itemBuilder: (context, index) {
                   var utensil = utensils[index];
@@ -90,9 +90,9 @@ class _UtensilistState extends State<Utensilist> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: bgColor,
-                      borderRadius: BorderRadius.circular(16), // More rounded corners
+                      borderRadius: BorderRadius.circular(16), // زوايا مستديرة أكثر
                     ),
-                    padding: EdgeInsets.all(16), // ✅ Increased padding
+                    padding: EdgeInsets.all(16), // ✅ زيادة التباعد الداخلي
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -100,13 +100,13 @@ class _UtensilistState extends State<Utensilist> {
                           utensil["name"],
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
-                        SizedBox(height: 6), // Added spacing
+                        SizedBox(height: 6), // إضافة تباعد
                         Text(
-                          "quantity: ${utensil["quantity"]}",
+                          "الكمية: ${utensil["quantity"]}",
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                         Text(
-                          "Available: ${utensil["available"]}",
+                          "المتوفر: ${utensil["available"]}",
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ],
@@ -117,16 +117,14 @@ class _UtensilistState extends State<Utensilist> {
             ),
           ),
 
-
-          /// 🔹 HELP BUTTON
+          /// 🔹 زر المساعدة
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildActionButton("Done", () {
-                print("Done");
+              _buildActionButton("تم", () {
+                print("تم");
                 Navigator.push(context, MaterialPageRoute(builder: (_) => IftarHelpScreen(uid: widget.uid,)));
               }),
-
             ],
           ),
           SizedBox(height: 20),
@@ -135,7 +133,7 @@ class _UtensilistState extends State<Utensilist> {
     );
   }
 
-  /// 🔹 FUNCTION TO BUILD ACTION BUTTON
+  /// 🔹 وظيفة لإنشاء زر الإجراء
   Widget _buildActionButton(String text, VoidCallback onPressed) {
     return Container(
       decoration: BoxDecoration(
@@ -145,7 +143,7 @@ class _UtensilistState extends State<Utensilist> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, // Transparent for gradient
+          backgroundColor: Colors.transparent, // شفاف لعرض التدرج اللوني
           shadowColor: Colors.transparent,
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -157,5 +155,4 @@ class _UtensilistState extends State<Utensilist> {
       ),
     );
   }
-
 }

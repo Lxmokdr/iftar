@@ -4,6 +4,8 @@ class color {
   static const Color bgColor =  Color(0xFFFFEFDB);
   static const Color lightbg = Color(0xFFFAF9F6);
   static const Color darkcolor = Color(0xFFDAA520);
+  static const Color navbar = Color(0xFFFFE234);
+
   static const Gradient goldGradient = LinearGradient(
     colors: [
       Color(0xFFFFE234), // Bright Gold (highlight)

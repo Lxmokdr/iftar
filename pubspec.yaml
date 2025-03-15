@@ -36,8 +36,9 @@ dependencies:
   firebase_core: ^3.12.1
   geolocator: ^10.1.0
   permission_handler: ^11.0.1
-  uuid: ^4.2.1
   intl: ^0.18.0
+
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -47,11 +48,19 @@ dependencies:
   firebase_storage: ^12.4.4
   google_sign_in: ^6.3.0
   geocoding: ^3.0.0
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
-  
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
+  adaptive_icon_background: "#ffffff"  # Change background color if needed
+  adaptive_icon_foreground: "assets/app_icon.png" # For Android adaptive icons
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

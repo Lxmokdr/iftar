@@ -25,7 +25,7 @@ class _IftarScreenState extends State<IftarScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Iftar',
+                  'إفطار',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color.darkcolor),
                 ),
                 IconButton(
@@ -43,7 +43,7 @@ class _IftarScreenState extends State<IftarScreen> {
               ),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search for restaurants',
+                  hintText: 'ابحث عن مطاعم',
                   border: InputBorder.none,
                   suffixIcon: Icon(Icons.search, color: color.darkcolor),
                 ),
@@ -51,7 +51,7 @@ class _IftarScreenState extends State<IftarScreen> {
             ),
             SizedBox(height: 16),
             Text(
-              'Available Restaurants',
+              'المطاعم المتاحة',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 12),
@@ -62,9 +62,9 @@ class _IftarScreenState extends State<IftarScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error loading restaurants.'));
+                    return Center(child: Text('حدث خطأ أثناء تحميل المطاعم.'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No restaurants available.'));
+                    return Center(child: Text('لا توجد مطاعم متاحة.'));
                   }
 
                   return ListView.builder(
@@ -72,9 +72,9 @@ class _IftarScreenState extends State<IftarScreen> {
                     itemBuilder: (context, index) {
                       var restaurant = snapshot.data![index];
                       return RestaurantCard(
-                        name: restaurant['name'] ?? 'Unknown',
-                        address: restaurant['address'] ?? 'Unknown Location',
-                        uid: restaurant['uid'] ?? '', // Ensure UID is included
+                        name: restaurant['name'] ?? 'غير معروف',
+                        address: restaurant['address'] ?? 'موقع غير معروف',
+                        uid: restaurant['uid'] ?? '',
                       );
                     },
                   );
@@ -129,7 +129,7 @@ class RestaurantCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text(address, style: TextStyle(color: Colors.grey)), // Fix: Address now displays properly
+                  Text(address, style: TextStyle(color: Colors.grey)),
                   SizedBox(height: 6),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -139,10 +139,10 @@ class RestaurantCard extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => IftarHelpScreen(uid: uid)), // Pass UID here
+                        MaterialPageRoute(builder: (context) => IftarHelpScreen(uid: uid)),
                       );
                     },
-                    child: Text('Help', style: TextStyle(color: Colors.white)),
+                    child: Text('المساعدة', style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),

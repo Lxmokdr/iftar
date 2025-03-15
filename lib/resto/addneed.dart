@@ -13,17 +13,17 @@ class _AddNeedState extends State<AddNeed> {
   String? selectedUtensil;
   TextEditingController quantityController = TextEditingController();
 
-  /// Predefined list of utensils for dropdown
+  /// قائمة الأدوات المسبقة للاختيار
   final List<String> utensilsList = [
-    "Spoon",
-    "Fork",
-    "Knife",
-    "Plate",
-    "Bowl",
-    "Glass",
-    "Napkin",
-    "Cooking Pot",
-    "Frying Pan"
+    "ملعقة",
+    "شوكة",
+    "سكين",
+    "طبق",
+    "وعاء",
+    "كوب",
+    "منديل",
+    "قدر طبخ",
+    "مقلاة"
   ];
 
   @override
@@ -33,29 +33,20 @@ class _AddNeedState extends State<AddNeed> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          /// 🔹 Full Gradient Background
+          /// 🔹 خلفية متدرجة كاملة
           Container(
             decoration: BoxDecoration(
               gradient: color.goldGradient,
             ),
           ),
 
-          /// 🔹 Top Title
+          /// 🔹 العنوان العلوي
           Padding(
             padding: EdgeInsets.only(top: 75),
             child: Column(
               children: [
                 Text(
-                  "WHAT DO U WANNA HELP",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "WITH?",
+                  "بِمَاذَا تُرِيدُ المُسَاعَدَة؟",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -86,17 +77,17 @@ class _AddNeedState extends State<AddNeed> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        /// 🔹 Dropdown for Utensil Selection
+                        /// 🔹 قائمة اختيار الأداة
                         _buildDropdownField(),
 
-                        /// 🔹 Input for Quantity
-                        _buildInputField("Quantity..", quantityController),
+                        /// 🔹 إدخال الكمية
+                        _buildInputField("الكمية..", quantityController),
 
-                        /// 🔹 ACTION BUTTON
+                        /// 🔹 زر الإجراء
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildActionButton("Done", () async {
+                            _buildActionButton("تم", () async {
                               await _addUtensil();
                             }),
                           ],
@@ -109,7 +100,7 @@ class _AddNeedState extends State<AddNeed> {
             ],
           ),
 
-          /// 🔹 Profile Image
+          /// 🔹 صورة الملف الشخصي
           Column(
             children: [
               SizedBox(height: 150),
@@ -124,61 +115,60 @@ class _AddNeedState extends State<AddNeed> {
     );
   }
 
-  /// 🔹 Function to add a utensil to Firestore
+  /// 🔹 وظيفة إضافة الأداة إلى Firestore
   Future<void> _addUtensil() async {
     int? quantity = int.tryParse(quantityController.text.trim());
 
     if (selectedUtensil == null || quantity == null || quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a utensil and enter a valid quantity.')),
+        SnackBar(content: Text('يرجى اختيار أداة وإدخال كمية صالحة.')),
       );
       return;
     }
 
     try {
-      // Get the logged-in user's ID
+      // الحصول على معرف المستخدم المسجل
       String? userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
-        throw Exception("User not logged in.");
+        throw Exception("المستخدم غير مسجل الدخول.");
       }
 
-      // Reference to user's utensils subcollection
+      // مرجع لمجموعة الأدوات الخاصة بالمستخدم
       CollectionReference utensilsRef = FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection('utensils');
 
-      // Add utensil to Firestore
+      // إضافة الأداة إلى Firestore
       await utensilsRef.add({
         'name': selectedUtensil,
         'quantity': quantity,
-        'available' : 0,
+        'available': 0,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Clear inputs after adding
+      // مسح الحقول بعد الإضافة
       setState(() {
         selectedUtensil = null;
         quantityController.clear();
       });
 
-      // Show success message
+      // عرض رسالة نجاح
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Utensil added successfully!')),
+        SnackBar(content: Text('تمت إضافة الأداة بنجاح!')),
       );
 
-      // Navigate to NeedsScreen
+      // الانتقال إلى شاشة الاحتياجات
       Navigator.push(context, MaterialPageRoute(builder: (_) => NeedsScreen()));
-
     } catch (e) {
-      print("Error adding utensil: $e");
+      print("خطأ في إضافة الأداة: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add utensil. Try again.')),
+        SnackBar(content: Text('فشل في إضافة الأداة. حاول مرة أخرى.')),
       );
     }
   }
 
-  /// 🔹 Function to build dropdown field
+  /// 🔹 بناء قائمة الاختيار
   Widget _buildDropdownField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -192,7 +182,7 @@ class _AddNeedState extends State<AddNeed> {
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: selectedUtensil,
-            hint: Text("Select a utensil", style: TextStyle(color: Colors.black54)),
+            hint: Text("اختر أداة", style: TextStyle(color: Colors.black54)),
             isExpanded: true,
             icon: Icon(Icons.arrow_drop_down, color: Colors.black),
             onChanged: (String? newValue) {

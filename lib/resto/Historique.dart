@@ -9,33 +9,33 @@ class HistoriqueScreen extends StatefulWidget {
 class _HistoriqueScreenState extends State<HistoriqueScreen> {
   DateTime? _selectedDate;
 
-  // Sample data for the history items.
+  // بيانات تجريبية لعناصر السجل.
   final List<Map<String, String>> historyItems = [
     {
-      'name': 'Menas Mohammed',
+      'name': 'منص محمد',
       'phone': '0557334515',
-      'item': '2 Marmites',
+      'item': '2 قدور',
       'date': '27/03/2024',
     },
     {
-      'name': 'Menas Mohammed',
+      'name': 'منص محمد',
       'phone': '0557334515',
-      'item': '250 da',
+      'item': '250 دج',
       'date': '29/03/2024',
     },
     {
-      'name': 'Menas Mohammed',
+      'name': 'منص محمد',
       'phone': '0557334515',
-      'item': '20 Bourak',
+      'item': '20 بوراك',
       'date': '01/04/2024',
     },
   ];
 
-  // Function to pick a date.
+  // وظيفة لاختيار تاريخ.
   Future<void> _pickDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(), 
+      initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -49,10 +49,9 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Screen background white.
       backgroundColor: Colors.white,
 
-      // AppBar
+      // شريط العنوان
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -64,7 +63,7 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Historique',
+          'السجل',
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -73,7 +72,6 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
         ),
         centerTitle: true,
         actions: [
-          // Calendar icon to pick a date.
           IconButton(
             icon: const Icon(Icons.calendar_today, color: Colors.black),
             onPressed: _pickDate,
@@ -81,7 +79,7 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
         ],
       ),
 
-      // Bottom Navigation Bar
+      // شريط التنقل السفلي
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         decoration: BoxDecoration(
@@ -96,25 +94,24 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
             unselectedItemColor: Colors.white70,
             elevation: 0,
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-              BottomNavigationBarItem(icon: Icon(Icons.message), label: 'INBOX'),
-              BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'POST'),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PROFILE'),
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'الرئيسية'),
+              BottomNavigationBarItem(icon: Icon(Icons.message), label: 'الرسائل'),
+              BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'إضافة'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'الملف الشخصي'),
             ],
           ),
         ),
       ),
 
-      // Body
+      // محتوى الشاشة
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Display selected date if available.
             if (_selectedDate != null)
               Text(
-                'Selected Date: ${_selectedDate.toString()}',
+                'التاريخ المحدد: ${_selectedDate.toString()}',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -123,9 +120,8 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
               ),
             const SizedBox(height: 16),
 
-            // Heading
             Text(
-              'Historique des aides',
+              'سجل المساعدات',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -134,7 +130,6 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
             ),
             const SizedBox(height: 16),
 
-            // List of history items.
             Column(
               children: historyItems.map((item) {
                 return _buildHistoryItem(item);
@@ -146,7 +141,7 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
     );
   }
 
-  // Builds a history item with a gold frame and shadow.
+  // بناء عنصر السجل
   Widget _buildHistoryItem(Map<String, String> item) {
     final name = item['name'] ?? '';
     final phone = item['phone'] ?? '';
@@ -156,11 +151,11 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
-        width: double.infinity, // Takes full horizontal space
+        width: double.infinity,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Color.fromARGB(100, 255, 197, 54),
-          border: Border.all(color: Color.fromARGB(100, 255, 197, 54), width: 1), // Gold border
+          border: Border.all(color: Color.fromARGB(100, 255, 197, 54), width: 1),
           borderRadius: BorderRadius.circular(8),
           boxShadow: const [
             BoxShadow(
@@ -173,7 +168,6 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Name
             Text(
               name,
               style: GoogleFonts.poppins(
@@ -183,7 +177,6 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            // Phone
             Text(
               phone,
               style: GoogleFonts.poppins(
@@ -192,7 +185,6 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            // Item info ("2 Marmites" or "250 da")
             Text(
               itemName,
               style: GoogleFonts.poppins(
@@ -201,7 +193,6 @@ class _HistoriqueScreenState extends State<HistoriqueScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            // Date
             Text(
               date,
               style: GoogleFonts.poppins(

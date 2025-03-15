@@ -86,7 +86,6 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
       String uid = FirebaseAuth.instance.currentUser!.uid;
       DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(uid);
 
-      // Formatting full date and time
       String fromFormattedDate = DateFormat('yyyy-MM-dd').format(fromDate!);
       String fromFormattedTime = "${fromTime!.hour.toString().padLeft(2, '0')}:${fromTime!.minute.toString().padLeft(2, '0')}";
 
@@ -95,11 +94,11 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
 
       Map<String, dynamic> availabilityEntry = {
         "from": {
-          "date": fromFormattedDate,  // Saving the full date
+          "date": fromFormattedDate,
           "time": fromFormattedTime
         },
         "to": {
-          "date": toFormattedDate,  // Saving the full date
+          "date": toFormattedDate,
           "time": toFormattedTime
         }
       };
@@ -108,19 +107,18 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
         "availability": FieldValue.arrayUnion([availabilityEntry]),
       });
 
-      print("Availability saved successfully!");
+      print("تم حفظ التوافر بنجاح!");
       Navigator.pop(context);
     } catch (e) {
-      print("Error saving availability: $e");
+      print("خطأ في حفظ التوافر: $e");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text("Select Availability"),
+      title: Text("حدد التوافر"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -128,12 +126,12 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
             readOnly: true,
             onTap: () => _selectDate(context, true),
             decoration: InputDecoration(
-              labelText: "From Date",
+              labelText: "من تاريخ",
               suffixIcon: Icon(Icons.calendar_today, color: color.darkcolor),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
             controller: TextEditingController(
-              text: fromDate != null ? DateFormat('EEEE').format(fromDate!) : "",
+              text: fromDate != null ? DateFormat('EEEE', 'ar').format(fromDate!) : "",
             ),
           ),
           SizedBox(height: 10),
@@ -141,7 +139,7 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
             readOnly: true,
             onTap: () => _selectTime(context, true),
             decoration: InputDecoration(
-              labelText: "From Time",
+              labelText: "من وقت",
               suffixIcon: Icon(Icons.access_time, color: color.darkcolor),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -154,12 +152,12 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
             readOnly: true,
             onTap: () => _selectDate(context, false),
             decoration: InputDecoration(
-              labelText: "To Date",
+              labelText: "إلى تاريخ",
               suffixIcon: Icon(Icons.calendar_today, color: color.darkcolor),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
             controller: TextEditingController(
-              text: toDate != null ? DateFormat('EEEE').format(toDate!) : "",
+              text: toDate != null ? DateFormat('EEEE', 'ar').format(toDate!) : "",
             ),
           ),
           SizedBox(height: 10),
@@ -167,7 +165,7 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
             readOnly: true,
             onTap: () => _selectTime(context, false),
             decoration: InputDecoration(
-              labelText: "To Time",
+              labelText: "إلى وقت",
               suffixIcon: Icon(Icons.access_time, color: color.darkcolor),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -180,11 +178,11 @@ class _TransportSelectionPopupState extends State<TransportSelectionPopup> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text("Cancel", style: TextStyle(color: color.darkcolor)),
+          child: Text("إلغاء", style: TextStyle(color: color.darkcolor)),
         ),
         ElevatedButton(
           onPressed: (fromDate != null && fromTime != null && toDate != null && toTime != null) ? _saveAvailability : null,
-          child: Text("Done", style: TextStyle(color: Colors.white)),
+          child: Text("تم", style: TextStyle(color: Colors.white)),
           style: ElevatedButton.styleFrom(backgroundColor: color.darkcolor),
         ),
       ],
